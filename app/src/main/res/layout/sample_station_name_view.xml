@@ -1,0 +1,48 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/darker_gray"
+    android:orientation="horizontal">
+
+    <com.example.linelayout.StationNameView
+        android:layout_width="50px"
+        android:layout_height="200px"
+        android:background="@color/colorAccent"
+        app:stationNameColor="#33b5e5"
+        app:stationNameSize="24sp"
+        app:stationName="郑" />
+
+    <com.example.linelayout.StationNameView
+        android:layout_width="50dp"
+        android:layout_height="200px"
+        android:background="@color/colorAccent"
+        app:stationNameColor="#33b5e5"
+        app:stationNameSize="24sp"
+        app:stationName="郑州" />
+
+    <com.example.linelayout.StationNameView
+        android:layout_width="50dp"
+        android:layout_height="200px"
+        android:background="@color/colorAccent"
+        app:stationNameColor="#33b5e5"
+        app:stationNameSize="24sp"
+        app:stationName="郑州欢" />
+
+    <com.example.linelayout.StationNameView
+        android:layout_width="100px"
+        android:layout_height="200px"
+        android:background="@color/colorAccent"
+        app:stationNameColor="#33b5e5"
+        app:stationNameSize="24sp"
+        app:stationName="郑州欢迎" />
+
+    <com.example.linelayout.StationNameView
+        android:layout_width="50dp"
+        android:layout_height="200px"
+        android:background="@color/colorAccent"
+        app:stationNameColor="#33b5e5"
+        app:stationNameSize="24sp"
+        app:stationNameLine="2"
+        app:stationName="郑州欢迎你" />
+</LinearLayout>

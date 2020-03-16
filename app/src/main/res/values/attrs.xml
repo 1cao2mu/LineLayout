@@ -1,0 +1,54 @@
+<resources>
+    <declare-styleable name="LineLayout">
+        <attr name="pointDrawable" format="color|reference" />
+        <attr name="lineDrawable" format="color|reference" />
+        <attr name="startDrawable" format="reference" />
+        <attr name="endDrawable" format="reference" />
+        <attr name="startEndMod" format="enum">
+            <enum name="top" value="0" />
+            <enum name="center" value="1" />
+        </attr>
+        <attr name="startEndWidth" format="dimension" />
+        <attr name="startEndHeight" format="dimension" />
+        <attr name="pointAnim" format="reference" />
+        <attr name="pointAnimWidth" format="dimension" />
+        <attr name="pointAnimHeight" format="dimension" />
+        <attr name="enterOutDrawable" format="reference" />
+        <attr name="enterOutWidth" format="dimension" />
+        <attr name="enterOutHeight" format="dimension" />
+        <attr name="enterOutRate" format="integer" />
+    </declare-styleable>
+    <declare-styleable name="StationNameView">
+        <attr name="stationName" format="string" />
+        <attr name="stationNameSize" format="dimension" />
+        <attr name="stationNameColor" format="color" />
+        <attr name="stationNameLine" format="integer" />
+    </declare-styleable>
+
+    <declare-styleable name="TipsNameView">
+        <attr name="tipsName" format="string" />
+        <attr name="tipsNameSize" format="dimension" />
+        <attr name="tipsNameColor" format="color" />
+        <attr name="tipsNameLine" format="integer" />
+    </declare-styleable>
+
+    <declare-styleable name="LineLayoutU">
+        <attr name="pointDrawableNoPass" format="color|reference" />
+        <attr name="pointDrawablePassed" format="color|reference" />
+        <attr name="pointDrawablePassing" format="color|reference" />
+        <attr name="lineDrawableNoPass" format="color|reference" />
+        <attr name="lineDrawablePassed" format="color|reference" />
+        <attr name="lineDrawablePassing" format="color|reference" />
+
+        <attr name="uTopDrawableNoPass" format="color|reference" />
+        <attr name="uBottomDrawableNoPass" format="color|reference" />
+
+        <attr name="remainMode" format="enum">
+            <enum name="topMax" value="0" />
+            <enum name="bottomMax" value="1" />
+            <enum name="centerMax" value="2" />
+        </attr>
+        <attr name="lineViewHeight" format="dimension" />
+        <attr name="tipsNameLayoutHeight" format="dimension" />
+    </declare-styleable>
+</resources>

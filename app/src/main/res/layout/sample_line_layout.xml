@@ -1,0 +1,23 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.example.linelayout.LineLayout
+        android:id="@+id/line"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/ic_launcher_background"
+        android:padding="20dp"
+        app:endDrawable="@mipmap/end_top"
+        app:lineDrawable="@drawable/ic_launcher_2"
+        app:pointAnim="@drawable/sation"
+        app:pointDrawable="@drawable/shape"
+        app:startDrawable="@mipmap/start_top"
+        app:enterOutDrawable="@drawable/go"
+        app:startEndHeight="50px"
+        app:startEndMod="center"
+        app:startEndWidth="50px"
+        app:enterOutRate="3"/>
+
+</FrameLayout>
