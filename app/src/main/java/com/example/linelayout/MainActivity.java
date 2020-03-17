@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
                 listData.add("第" + i + "站");
             }
             line_r.setListData(listData);
+            line_r.setStopNumber(9,1);
         }
-
     }
 }

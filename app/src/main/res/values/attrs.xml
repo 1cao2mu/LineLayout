@@ -48,9 +48,21 @@
         <attr name="lineDrawablePassingR" format="color|reference" />
 
         <attr name="rightTopDrawableNoPassR" format="color|reference" />
+        <attr name="rightTopDrawablePassedR" format="color|reference" />
+        <attr name="rightTopDrawablePassingR" format="color|reference" />
         <attr name="rightBottomDrawableNoPassR" format="color|reference" />
+        <attr name="rightBottomDrawablePassedR" format="color|reference" />
+        <attr name="rightBottomDrawablePassingR" format="color|reference" />
         <attr name="leftTopDrawableNoPassR" format="color|reference" />
+        <attr name="leftTopDrawablePassedR" format="color|reference" />
+        <attr name="leftTopDrawablePassingR" format="color|reference" />
         <attr name="leftBottomDrawableNoPassR" format="color|reference" />
+        <attr name="leftBottomDrawablePassedR" format="color|reference" />
+        <attr name="leftBottomDrawablePassingR" format="color|reference" />
+
+        <attr name="pointAnimR" format="reference" />
+        <attr name="pointAnimWidthR" format="dimension" />
+        <attr name="pointAnimHeightR" format="dimension" />
 
         <attr name="lineViewHeightR" format="dimension" />
         <attr name="tipsNameLayoutHeightR" format="dimension" />

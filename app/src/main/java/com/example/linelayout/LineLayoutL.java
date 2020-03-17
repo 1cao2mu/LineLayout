@@ -326,7 +326,6 @@ public class LineLayoutL extends ViewGroup {
                         handler.sendEmptyMessageDelayed(0, pointAnim.getDuration(pointAnimCurrentInt));
                     }
                 }
-
                 continue;
             }
             pointDrawable.setBounds((int) (stationPoints[i * 2] - stationWidth / 2), (int) (offsetTop - stationHeight / 2),

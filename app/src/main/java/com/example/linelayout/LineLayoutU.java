@@ -129,7 +129,7 @@ public class LineLayoutU extends ViewGroup {
 
 
         int lineDrawableNoPassId = a.getResourceId(
-                R.styleable.LineLayoutU_lineDrawableNoPass, R.drawable.default_u_line_view_img);
+                R.styleable.LineLayoutU_lineDrawableNoPass, R.drawable.default_u_line_view_img_no_pass);
         Bitmap lineDrawableNoPassBitmap = BitmapFactory.decodeResource(getResources(), lineDrawableNoPassId);
         lineDrawableNoPassNinePatch = new NinePatch(lineDrawableNoPassBitmap, lineDrawableNoPassBitmap.getNinePatchChunk(), null);
 
