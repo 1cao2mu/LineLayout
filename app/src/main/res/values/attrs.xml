@@ -18,21 +18,6 @@
         <attr name="enterOutHeight" format="dimension" />
         <attr name="enterOutRate" format="integer" />
     </declare-styleable>
-    <declare-styleable name="StationNameView">
-        <attr name="stationName" format="string" />
-        <attr name="stationNameSize" format="dimension" />
-        <attr name="stationNameColor" format="color" />
-        <attr name="stationNameLine" format="integer" />
-    </declare-styleable>
-
-    <declare-styleable name="TipsNameView">
-        <attr name="tipsName" format="string" />
-        <attr name="tipsNameSize" format="dimension" />
-        <attr name="tipsNameColor" format="color" />
-        <attr name="tipsNameOffset" format="integer" />
-        <attr name="tipsNameSpeed" format="integer" />
-        <attr name="tipsNameBold" format="boolean" />
-    </declare-styleable>
 
     <declare-styleable name="LineLayoutU">
         <attr name="pointDrawableNoPass" format="color|reference" />
@@ -69,5 +54,23 @@
 
         <attr name="lineViewHeightR" format="dimension" />
         <attr name="tipsNameLayoutHeightR" format="dimension" />
+    </declare-styleable>
+
+
+    <declare-styleable name="StationNameView">
+        <attr name="stationNameString" format="string" />
+        <attr name="stationNameSize" format="dimension" />
+        <attr name="stationNameColor" format="color" />
+        <attr name="stationNameSpeed" format="float" />
+        <attr name="stationNameBold" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="TipsNameView">
+        <attr name="tipsNameString" format="string" />
+        <attr name="tipsNameSize" format="dimension" />
+        <attr name="tipsNameColor" format="color" />
+        <attr name="tipsNameOffset" format="integer" />
+        <attr name="tipsNameSpeed" format="float" />
+        <attr name="tipsNameBold" format="boolean" />
     </declare-styleable>
 </resources>

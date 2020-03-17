@@ -22,7 +22,7 @@ public class TipsNameView extends View {
     private int tipsNameColor = Color.RED; // 文字颜色
     private float tipsNameSize = 35; // 文字大小
     private int tipsNameOffset = 3; //偏移几个文字
-    private int tipsNameSpeed = 1; //滚动速度
+    private float tipsNameSpeed = 1; //滚动速度
     private boolean tipsNameBold = true; //滚动速度
 
     private TextPaint mTextPaint;//文字画笔
@@ -50,9 +50,9 @@ public class TipsNameView extends View {
         // Load attributes
         final TypedArray a = getContext().obtainStyledAttributes(
                 attrs, R.styleable.TipsNameView, defStyle, 0);
-        if (a.hasValue(R.styleable.TipsNameView_tipsName)) {
+        if (a.hasValue(R.styleable.TipsNameView_tipsNameString)) {
             tipsNameString = a.getString(
-                    R.styleable.TipsNameView_tipsName);
+                    R.styleable.TipsNameView_tipsNameString);
         } else {
             tipsNameString = "";
         }
@@ -63,7 +63,7 @@ public class TipsNameView extends View {
                 tipsNameSize);
         tipsNameOffset = a.getInteger(R.styleable.TipsNameView_tipsNameOffset,
                 tipsNameOffset);
-        tipsNameSpeed = a.getInteger(R.styleable.TipsNameView_tipsNameSpeed,
+        tipsNameSpeed = a.getFloat(R.styleable.TipsNameView_tipsNameSpeed,
                 tipsNameSpeed);
         tipsNameBold = a.getBoolean(R.styleable.TipsNameView_tipsNameSpeed,
                 tipsNameBold);
@@ -72,15 +72,15 @@ public class TipsNameView extends View {
         mTextPaint = new TextPaint();
         mTextPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
         mTextPaint.setTextAlign(Paint.Align.LEFT);
+    }
+
+
+    private void invalidateTextPaintAndMeasurements() {
         if (tipsNameBold) {
             mTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
         } else {
             mTextPaint.setTypeface(Typeface.DEFAULT);
         }
-    }
-
-
-    private void invalidateTextPaintAndMeasurements() {
         mTextPaint.setTextSize(tipsNameSize);
         mTextPaint.setColor(tipsNameColor);
         oneTextWidth = mTextPaint.measureText("测");//计算一个字的宽度
@@ -94,8 +94,8 @@ public class TipsNameView extends View {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        this.widthMeasureSpec=widthMeasureSpec;
-        this.heightMeasureSpec=heightMeasureSpec;
+        this.widthMeasureSpec = widthMeasureSpec;
+        this.heightMeasureSpec = heightMeasureSpec;
         invalidateTextPaintAndMeasurements();
         // 获得它的父容器为它设置的测量模式和大小
         int widthMode = MeasureSpec.getMode(widthMeasureSpec);
@@ -121,7 +121,7 @@ public class TipsNameView extends View {
     }
 
 
-    private int dx = 0;
+    private float dx = 0;
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -159,21 +159,26 @@ public class TipsNameView extends View {
 
     public void setTipsNameColor(int tipsNameColor) {
         this.tipsNameColor = tipsNameColor;
+        invalidate();
     }
 
     public void setTipsNameSize(float tipsNameSize) {
         this.tipsNameSize = tipsNameSize;
+        invalidate();
     }
 
     public void setTipsNameOffset(int tipsNameOffset) {
         this.tipsNameOffset = tipsNameOffset;
+        invalidate();
     }
 
     public void setTipsNameSpeed(int tipsNameSpeed) {
         this.tipsNameSpeed = tipsNameSpeed;
+        invalidate();
     }
 
     public void setTipsNameBold(boolean tipsNameBold) {
         this.tipsNameBold = tipsNameBold;
+        invalidate();
     }
 }

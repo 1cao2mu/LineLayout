@@ -5,6 +5,7 @@ import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.NinePatch;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -46,6 +47,12 @@ public class LineLayoutR extends ViewGroup {
     private Drawable leftBottomDrawableNoPassR;
     private Drawable rightBottomDrawableNoPassR;
 
+    private int stationNameNoPassColor = Color.BLACK;
+    private float stationNameSize = 25;
+    private float stationNameSpeed = 0.5f;
+    private boolean stationNameBold = true;
+    private int stationNameMaxLine = 7;
+
     //需要使用的局部变量
     private Context context;
     private int topPerWidth = 0;
@@ -64,6 +71,7 @@ public class LineLayoutR extends ViewGroup {
     private int offsetRight = 0;
 
     //子组件和相关
+    private List<StationNameView> nameViewList = new ArrayList<>();
     private ImageView iv_next_tip;
     private TextView tv_next_tip;
     private TipsNameView tv_change_message;
@@ -358,14 +366,7 @@ public class LineLayoutR extends ViewGroup {
     private void handleListData() {
         Log.e("handleListData", getWidth() + " " + getHeight());
         removeAllViews();
-        for (int i = 0; i < listData.size(); i++) {
-            StationNameView stationNameView = new StationNameView(context);
-            FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(30, 60);
-            stationNameView.setLayoutParams(layoutParams);
-            stationNameView.setStationNameSize(30);
-            stationNameView.setStationNameString(listData.get(i));
-            addView(stationNameView);
-        }
+        nameViewList.clear();
         int listSize = listData.size();
         if (listSize % 2 == 0) {
             topPointNum = listSize / 2;
@@ -373,6 +374,22 @@ public class LineLayoutR extends ViewGroup {
         } else {
             topPointNum = listSize / 2;
             bottomPointNum = listSize / 2 + 1;
+        }
+        for (int i = 0; i < listData.size(); i++) {
+            String content = listData.get(i);
+            StationNameView stationNameView = new StationNameView(context);
+            stationNameView.setStationNameSize(stationNameSize);
+            stationNameView.setStationNameBold(stationNameBold);
+            stationNameView.setStationNameSpeed(stationNameSpeed);
+            stationNameView.setStationNameColor(stationNameNoPassColor);
+            float oneTextWidth = stationNameView.getOneTextWidth();
+            float oneTextHeight = stationNameView.getOneTextHeight();
+            int lineNum = content.length() > stationNameMaxLine ? stationNameMaxLine : content.length();
+            FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams((int) oneTextWidth, (int) (oneTextHeight * lineNum) + 1);
+            stationNameView.setLayoutParams(layoutParams);
+            stationNameView.setStationNameString(listData.get(i));
+            addView(stationNameView);
+            nameViewList.add(stationNameView);
         }
         topLinePoints = new float[(topPointNum - 1) * 4];
         bottomLinePoints = new float[(bottomPointNum - 1) * 4];

@@ -11,7 +11,7 @@
         android:background="@color/colorAccent"
         app:stationNameColor="#33b5e5"
         app:stationNameSize="24sp"
-        app:stationName="郑" />
+        app:stationNameString="郑" />
 
     <com.example.linelayout.StationNameView
         android:layout_width="50dp"
@@ -19,7 +19,7 @@
         android:background="@color/colorAccent"
         app:stationNameColor="#33b5e5"
         app:stationNameSize="24sp"
-        app:stationName="郑州" />
+        app:stationNameString="郑州" />
 
     <com.example.linelayout.StationNameView
         android:layout_width="50dp"
@@ -27,7 +27,7 @@
         android:background="@color/colorAccent"
         app:stationNameColor="#33b5e5"
         app:stationNameSize="24sp"
-        app:stationName="郑州欢" />
+        app:stationNameString="郑州欢" />
 
     <com.example.linelayout.StationNameView
         android:layout_width="100px"
@@ -35,7 +35,7 @@
         android:background="@color/colorAccent"
         app:stationNameColor="#33b5e5"
         app:stationNameSize="24sp"
-        app:stationName="郑州欢迎" />
+        app:stationNameString="郑州欢迎" />
 
     <com.example.linelayout.StationNameView
         android:layout_width="50dp"
@@ -43,6 +43,6 @@
         android:background="@color/colorAccent"
         app:stationNameColor="#33b5e5"
         app:stationNameSize="24sp"
-        app:stationNameLine="2"
-        app:stationName="郑州欢迎你" />
+        app:stationNameSpeed="2"
+        app:stationNameString="郑州欢迎你" />
 </LinearLayout>
