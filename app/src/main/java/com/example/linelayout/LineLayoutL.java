@@ -7,7 +7,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.NinePatch;
-import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.Drawable;
@@ -31,48 +30,52 @@ import java.util.List;
  * 自定义线路组件
  */
 public class LineLayoutL extends ViewGroup {
-    //可以设置的参数变量
     private static final int STARTENDMOD_TOP = 0;
     private static final int STARTENDMOD_CENTER = 1;
+    //可以设置的参数变量
+    private float tipsNameLayoutHeight = 100;
+    private int lineLayoutHeight = 40;
+    private int lineViewHeight = 22;
+
+
+    private int stationNameNoPassColor = Color.BLUE;
+    private int stationNamePassedColor = Color.RED;
+    private int stationNamePassingColor = Color.YELLOW;
+    private float stationNameSize = 25;
+    private float stationNameSpeed = 0.5f;
+    private boolean stationNameBold = true;
+    private int stationNameMaxLine = 7;
+    private int stopNumber = -1;
+    private int stopType = -1;//0是进站 1是出站
+
     private Drawable startDrawable;
     private Drawable endDrawable;
     private float startEndWidth = 20;
     private float startEndHeight = 20;
-
     private int startEndMod;
     private float stationWidth = 20;
     private float stationHeight = 20;
-    private float lineHeight = 20;
-    private float lineViewHeight = 30;
-    private Drawable pointDrawable;
-    private Bitmap lineBitmap;
-    private Drawable lineDrawable;
-    private Boolean lineBitmapIsNinePatch = false;
-    private List<String> listData = new ArrayList<>();//线路数据
-    private int linePaintNotPassedColor = Color.BLUE;//默认的未驶过线路颜色
-    private int linePaintPassedColor = Color.RED;//默认的已驶过线路颜色
-    private int pointPaintNotPassedColor = Color.GRAY;//默认的未驶过站点颜色
-    private int pointPaintPassedColor = Color.BLACK;//默认的未驶过站点颜色
-    private float offsetTop = 200;//顶部预留多少给站点提示信息
-    private int stopNumber = 3;//从零开始
-    //需要使用的局部变量
-    private Paint linePaintNotPassed;//画未驶过线路的画笔
-    private Paint linePaintPassed;//画已驶过线路的画笔
-    private Paint pointPaintNotPassed;//画未驶过站点的画笔
-    private Paint pointPaintPassed;//画已驶过站点的画笔
-    private float perWidth;//每个站点所需要占的大小
-    private Context context;
-    private float[] linePoints;
-    private float[] stationPoints;
     private AnimationDrawable pointAnim;
     private float pointAnimWidth = 20;
     private float pointAnimHeight = 20;
     private int pointAnimCurrentInt = -1;
-
     private Drawable enterOutDrawable;
     private float enterOutWidth = 40;
     private float enterOutHeight = 40;
     private int enterOutRate = 3;
+    private Drawable pointDrawable;
+    private Bitmap lineBitmap;
+    private Drawable lineDrawable;
+    private Boolean lineBitmapIsNinePatch = false;
+    //需要使用的局部变量
+    private float perWidth;//每个站点所需要占的大小
+    private Context context;
+    private float[] linePoints;
+    private float[] stationPoints;
+    private float stationOneTextWidth;
+    private List<String> listData = new ArrayList<>();//线路数据
+
+
     private Handler handler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(@NonNull Message msg) {
@@ -126,7 +129,7 @@ public class LineLayoutL extends ViewGroup {
         int paddingBottom = getPaddingBottom();
         int contentWidth = totalWidth - paddingLeft - paddingRight;
         int contentHeight = totalHeight - paddingTop - paddingBottom;
-        perWidth = contentWidth / (listData.size());
+        perWidth = (contentWidth - stationOneTextWidth) / (listData.size() - 1);
         final int count = getChildCount();
         int left, top, right, bottom;
         for (int i = 0, j = -1; i < count; i++) {
@@ -137,14 +140,14 @@ public class LineLayoutL extends ViewGroup {
                 int childMeasureWidth = child.getMeasuredWidth();
                 int childMeasureHeight = child.getMeasuredHeight();
                 //如果一行没有排满，继续往右排列
-                left = (int) (paddingLeft + (j + 0.5f) * perWidth - childMeasureWidth / 2f);
+                left = (int) (paddingLeft + j * perWidth);
                 right = left + childMeasureWidth;
-                top = (int) offsetTop + 30;
+                top = (int) tipsNameLayoutHeight + lineLayoutHeight + paddingTop;
                 bottom = top + childMeasureHeight;
                 //确定子控件的位置，四个参数分别代表（左上右下）点的坐标值
                 child.layout(left, top, right, bottom);
             } else {
-                child.layout(paddingLeft, 0, contentWidth + paddingLeft, (int) offsetTop);
+                child.layout((int) (paddingLeft + startEndWidth), paddingTop, (int) (contentWidth + paddingLeft - startEndWidth), (int) tipsNameLayoutHeight + paddingTop);
             }
         }
     }
@@ -152,7 +155,20 @@ public class LineLayoutL extends ViewGroup {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         // 计算出所有的childView的宽和高
-        measureChildren(widthMeasureSpec, heightMeasureSpec);
+        // 计算出所有的childView的宽和高
+        final int size = getChildCount();
+        for (int i = 0; i < size; ++i) {
+            final View child = getChildAt(i);
+            if (child.getVisibility() != GONE) {
+                if (child instanceof StationNameView) {
+                    measureChild(child, widthMeasureSpec, heightMeasureSpec);
+                } else {
+                    int widthSize = MeasureSpec.getSize(widthMeasureSpec);
+                    int widthMeasureSpec_t = MeasureSpec.makeMeasureSpec((int) (widthSize - startEndWidth - startEndWidth), MeasureSpec.EXACTLY);
+                    measureChild(child, widthMeasureSpec_t, heightMeasureSpec);
+                }
+            }
+        }
         //测量并保存layout的宽高(使用getDefaultSize时，wrap_content和match_perent都是填充屏幕)
         //稍后会重新写这个方法，能达到wrap_content的效果
         setMeasuredDimension(getDefaultSize(getSuggestedMinimumWidth(), widthMeasureSpec),
@@ -220,36 +236,7 @@ public class LineLayoutL extends ViewGroup {
             }
             rect = new Rect();
         }
-
         a.recycle();
-        initData();
-    }
-
-    private void initData() {
-        linePoints = new float[(listData.size() + 1) * 4];
-        stationPoints = new float[listData.size() * 2];
-        linePaintNotPassed = new Paint();
-        linePaintNotPassed.setColor(linePaintNotPassedColor);
-        linePaintNotPassed.setFlags(Paint.ANTI_ALIAS_FLAG);
-        linePaintNotPassed.setStrokeWidth(lineHeight);
-        linePaintPassed = new Paint();
-        linePaintPassed.setColor(linePaintPassedColor);
-        linePaintPassed.setFlags(Paint.ANTI_ALIAS_FLAG);
-        linePaintPassed.setStrokeWidth(lineHeight);
-        pointPaintNotPassed = new Paint();
-        pointPaintNotPassed.setColor(pointPaintNotPassedColor);
-        pointPaintNotPassed.setFlags(Paint.ANTI_ALIAS_FLAG);
-        pointPaintNotPassed.setStrokeWidth(20);
-        pointPaintPassed = new Paint();
-        pointPaintPassed.setColor(pointPaintPassedColor);
-        pointPaintPassed.setFlags(Paint.ANTI_ALIAS_FLAG);
-        pointPaintPassed.setStrokeWidth(20);
-    }
-
-
-    @Override
-    public void setBackground(Drawable background) {
-        super.setBackground(background);
     }
 
     @Override
@@ -265,32 +252,23 @@ public class LineLayoutL extends ViewGroup {
         int paddingBottom = getPaddingBottom();
         int contentWidth = totalWidth - paddingLeft - paddingRight;
         int contentHeight = totalHeight - paddingTop - paddingBottom;
-        perWidth = contentWidth / (listData.size());
+        float lineCenter = tipsNameLayoutHeight + paddingTop + lineLayoutHeight / 2f;
+        float paddingLeftLeft = paddingLeft + stationOneTextWidth / 2f;
         for (int i = 0; i < listData.size(); i++) {
-            if (i == 0) {
-                linePoints[i * 4] = paddingLeft;
-                linePoints[i * 4 + 1] = offsetTop;
-                linePoints[i * 4 + 2] = paddingLeft + (i + 0.5f) * perWidth;
-                linePoints[i * 4 + 3] = offsetTop;
+            if (i != listData.size() - 1) {
+                linePoints[i * 4] = paddingLeftLeft + (i * perWidth);
+                linePoints[i * 4 + 1] = lineCenter;
+                linePoints[i * 4 + 2] = paddingLeftLeft + ((i + 1.0f) * perWidth);
+                linePoints[i * 4 + 3] = lineCenter;
             }
-            int j = i + 1;
-            linePoints[j * 4] = paddingLeft + ((i + 0.5f) * perWidth);
-            linePoints[j * 4 + 1] = offsetTop;
-            if (i == listData.size() - 1) {
-                linePoints[j * 4 + 2] = paddingLeft + ((i + 1.0f) * perWidth);
-            } else {
-                linePoints[j * 4 + 2] = paddingLeft + ((i + 1.5f) * perWidth);
-            }
-            linePoints[j * 4 + 3] = offsetTop;
-            stationPoints[i * 2] = paddingLeft + (i + 0.5f) * perWidth;
-            stationPoints[i * 2 + 1] = offsetTop;
+            stationPoints[i * 2] = paddingLeftLeft + i * perWidth;
+            stationPoints[i * 2 + 1] = lineCenter;
         }
         for (int i = 0; i < listData.size() - 1; i++) {
-            int j = i + 1;
-            rect.left = (int) (linePoints[j * 4]);
-            rect.top = (int) (linePoints[j * 4 + 1] - 10);
-            rect.right = (int) (linePoints[j * 4 + 2]);
-            rect.bottom = (int) (linePoints[j * 4 + 3] + 10);
+            rect.left = (int) (linePoints[i * 4]);
+            rect.top = (int) (linePoints[i * 4 + 1] - lineViewHeight / 2f);
+            rect.right = (int) (linePoints[i * 4 + 2]);
+            rect.bottom = (int) (linePoints[i * 4 + 3] + lineViewHeight / 2f);
             if (lineBitmapIsNinePatch) {
                 ninePatch.draw(canvas, rect);
             } else {
@@ -306,21 +284,21 @@ public class LineLayoutL extends ViewGroup {
                     drawable = endDrawable;
                 }
                 if (startEndMod == STARTENDMOD_CENTER) {
-                    drawable.setBounds((int) (stationPoints[i * 2] - startEndHeight / 2), (int) (offsetTop - startEndHeight / 2),
-                            (int) (stationPoints[i * 2] + startEndHeight / 2), (int) (offsetTop + startEndHeight / 2));
+                    drawable.setBounds((int) (stationPoints[i * 2] - startEndHeight / 2), (int) (lineCenter - startEndHeight / 2),
+                            (int) (stationPoints[i * 2] + startEndHeight / 2), (int) (lineCenter + startEndHeight / 2));
                     drawable.draw(canvas);
                     continue;
                 } else if (startEndMod == STARTENDMOD_TOP) {
-                    drawable.setBounds((int) (stationPoints[i * 2] - startEndHeight / 2), (int) (offsetTop - lineViewHeight / 2 - startEndHeight),
-                            (int) (stationPoints[i * 2] + startEndHeight / 2), (int) (offsetTop - lineViewHeight / 2));
+                    drawable.setBounds((int) (stationPoints[i * 2] - startEndHeight / 2), (int) (lineCenter - lineViewHeight / 2 - startEndHeight),
+                            (int) (stationPoints[i * 2] + startEndHeight / 2), (int) (lineCenter - lineViewHeight / 2));
                     drawable.draw(canvas);
                 }
             }
             if (stopNumber == i) {
                 if (pointAnim != null && pointAnimCurrentInt != -1) {
                     Drawable drawable = pointAnim.getFrame(pointAnimCurrentInt);
-                    drawable.setBounds((int) (stationPoints[i * 2] - pointAnimWidth / 2), (int) (offsetTop - pointAnimHeight / 2),
-                            (int) (stationPoints[i * 2] + pointAnimWidth / 2), (int) (offsetTop + pointAnimHeight / 2));
+                    drawable.setBounds((int) (stationPoints[i * 2] - pointAnimWidth / 2), (int) (lineCenter - pointAnimHeight / 2),
+                            (int) (stationPoints[i * 2] + pointAnimWidth / 2), (int) (lineCenter + pointAnimHeight / 2));
                     drawable.draw(canvas);
                     if (!handler.hasMessages(0)) {
                         handler.sendEmptyMessageDelayed(0, pointAnim.getDuration(pointAnimCurrentInt));
@@ -328,14 +306,14 @@ public class LineLayoutL extends ViewGroup {
                 }
                 continue;
             }
-            pointDrawable.setBounds((int) (stationPoints[i * 2] - stationWidth / 2), (int) (offsetTop - stationHeight / 2),
-                    (int) (stationPoints[i * 2] + stationWidth / 2), (int) (offsetTop + stationHeight / 2));
+            pointDrawable.setBounds((int) (stationPoints[i * 2] - stationWidth / 2), (int) (lineCenter - stationHeight / 2),
+                    (int) (stationPoints[i * 2] + stationWidth / 2), (int) (lineCenter + stationHeight / 2));
             pointDrawable.draw(canvas);
         }
         if (enterOutDrawable != null) {
             if (stopNumber != -1) {
-                enterOutDrawable.setBounds((int) (stationPoints[stopNumber * 2] - enterOutWidth / 2 + enterOutOffset), (int) (offsetTop - enterOutHeight / 2),
-                        (int) (stationPoints[stopNumber * 2] + enterOutWidth / 2 + enterOutOffset), (int) (offsetTop + enterOutHeight / 2));
+                enterOutDrawable.setBounds((int) (stationPoints[stopNumber * 2] - enterOutWidth / 2 + enterOutOffset), (int) (lineCenter - enterOutHeight / 2),
+                        (int) (stationPoints[stopNumber * 2] + enterOutWidth / 2 + enterOutOffset), (int) (lineCenter + enterOutHeight / 2));
                 enterOutDrawable.draw(canvas);
                 enterOutOffset = enterOutOffset + enterOutRate;
                 if (enterOutOffset > perWidth) {
@@ -358,20 +336,48 @@ public class LineLayoutL extends ViewGroup {
     private void handleListData() {
         Log.e("handleListData", getWidth() + " " + getHeight());
         removeAllViews();
+        int listSize = listData.size();
         for (int i = 0; i < listData.size(); i++) {
+            String content = listData.get(i);
             StationNameView stationNameView = new StationNameView(context);
-            FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(30, 60);
+            stationNameView.setStationNameSize(stationNameSize);
+            stationNameView.setStationNameBold(stationNameBold);
+            stationNameView.setStationNameSpeed(stationNameSpeed);
+            int nameColor;
+            if (i < stopNumber) {
+                nameColor = stationNamePassedColor;
+            } else if (i == stopNumber) {
+                nameColor = stationNamePassingColor;
+            } else {
+                nameColor = stationNameNoPassColor;
+            }
+            stationNameView.setStationNameColor(nameColor);
+            stationOneTextWidth = stationNameView.getOneTextWidth();
+            float oneTextHeight = stationNameView.getOneTextHeight();
+            int lineNum = content.length() > stationNameMaxLine ? stationNameMaxLine : content.length();
+            FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams((int) stationOneTextWidth, (int) (oneTextHeight * lineNum) + 1);
             stationNameView.setLayoutParams(layoutParams);
-            stationNameView.setStationNameSize(30);
             stationNameView.setStationNameString(listData.get(i));
             addView(stationNameView);
         }
-        linePoints = new float[(listData.size() + 1) * 4];
+        linePoints = new float[(listData.size() - 1) * 4];
         stationPoints = new float[listData.size() * 2];
         View view = View.inflate(context, R.layout.view_next_station_tips, null);
         iv_next_tip = view.findViewById(R.id.iv_next_tip);
         tv_next_tip = view.findViewById(R.id.tv_next_tip);
         tv_change_message = view.findViewById(R.id.tv_change_message);
+        if (stopNumber != -1) {
+            view.setVisibility(View.VISIBLE);
+            int s = stopNumber;
+            if (stopNumber == listSize) {
+                s = 0;
+            }
+            tv_next_tip.setText(stopType == 0 ? "当前站:" + listData.get(s) : "下一站:" + listData.get(s));
+        } else {
+            view.setVisibility(View.INVISIBLE);
+        }
+        iv_next_tip.setVisibility(View.GONE);
+        tv_change_message.setTipsNameString("水水水水水水水水水水水水水水水水水水水上飞机苟富贵水水水水水水水水水水水水水水水水水水水上飞机苟富贵");
         addView(view);
     }
 
@@ -385,6 +391,16 @@ public class LineLayoutL extends ViewGroup {
 
     public TipsNameView getTv_change_message() {
         return tv_change_message;
+    }
+
+    public void setStopNumber(int stopNumber, int stopType) {
+        this.stopType = stopType;
+        if (stopType == 1) {
+            this.stopNumber = stopNumber + 1;
+        } else {
+            this.stopNumber = stopNumber;
+        }
+        handleListData();
     }
 
 

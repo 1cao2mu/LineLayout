@@ -16,7 +16,7 @@
         app:startDrawable="@mipmap/start_top"
         app:enterOutDrawable="@drawable/go"
         app:startEndHeight="50px"
-        app:startEndMod="center"
+        app:startEndMod="top"
         app:startEndWidth="50px"
         app:enterOutRate="3"/>
 

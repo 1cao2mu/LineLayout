@@ -17,15 +17,16 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.sample_line_layout_r);
+        setContentView(R.layout.sample_line_layout);
         line=findViewById(R.id.line);
         line_u=findViewById(R.id.line_u);
         line_r=findViewById(R.id.line_r);
         if (line!=null){
-            for (int i = 0; i < 6; i++) {
+            for (int i = 0; i < 8; i++) {
                 listData.add("第" + i + "站");
             }
             line.setListData(listData);
+            line.setStopNumber(5,1);
         }
         if (line_u!=null){
             for (int i = 0; i < 10; i++) {
