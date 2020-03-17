@@ -51,4 +51,21 @@
         <attr name="lineViewHeight" format="dimension" />
         <attr name="tipsNameLayoutHeight" format="dimension" />
     </declare-styleable>
+
+    <declare-styleable name="LineLayoutR">
+        <attr name="pointDrawableNoPassR" format="color|reference" />
+        <attr name="pointDrawablePassedR" format="color|reference" />
+        <attr name="pointDrawablePassingR" format="color|reference" />
+        <attr name="lineDrawableNoPassR" format="color|reference" />
+        <attr name="lineDrawablePassedR" format="color|reference" />
+        <attr name="lineDrawablePassingR" format="color|reference" />
+
+        <attr name="rightTopDrawableNoPassR" format="color|reference" />
+        <attr name="rightBottomDrawableNoPassR" format="color|reference" />
+        <attr name="leftTopDrawableNoPassR" format="color|reference" />
+        <attr name="leftBottomDrawableNoPassR" format="color|reference" />
+
+        <attr name="lineViewHeightR" format="dimension" />
+        <attr name="tipsNameLayoutHeightR" format="dimension" />
+    </declare-styleable>
 </resources>

@@ -18,9 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 自定义线路组件-U型
+ * 自定义线路组件-环型
  */
-public class LineLayoutU extends ViewGroup {
+public class LineLayoutRing extends ViewGroup {
     // TODO: 2020/3/13 以后统一加注释
     //静态变量
     private static final int REMAINMODE_TOPMAX = 0;
@@ -39,12 +39,10 @@ public class LineLayoutU extends ViewGroup {
     private int pointViewWidth = 30;
     private int remainMode = REMAINMODE_CENTERMAX;
     private int tipsNameLayoutHeight = 100;
-    private Drawable uTopDrawableNoPass;
-    private Drawable uBottomDrawableNoPass;
-    private Drawable uTopDrawablePassed;
-    private Drawable uBottomDrawablePassed;
-    private Drawable uTopDrawablePassing;
-    private Drawable uBottomDrawablePassing;
+    private Drawable leftTopDrawableNoPassR;
+    private Drawable rightTopDrawableNoPassR;
+    private Drawable leftBottomDrawableNoPassR;
+    private Drawable rightBottomDrawableNoPassR;
 
     //需要使用的局部变量
     private Context context;
@@ -52,7 +50,6 @@ public class LineLayoutU extends ViewGroup {
     private int bottomPerWidth = 0;
     private List<String> listData = new ArrayList<>();
     private float[] topLinePoints;
-    private float[] centerLinePoints;
     private float[] bottomLinePoints;
     private float[] topPointPoints;
     private float[] centerPointPoints;
@@ -60,25 +57,23 @@ public class LineLayoutU extends ViewGroup {
     private int topPointNum = 0;
     private int bottomPointNum = 0;
     private NinePatch lineDrawableNoPassNinePatch;
-    private NinePatch uTopDrawableNoPassNinePatch;
-    private NinePatch uBottomDrawableNoPassNinePatch;
     private Rect rect;
     private int offsetLeft = 0;
     private int offsetRight = 0;
 
-    public LineLayoutU(Context context) {
+    public LineLayoutRing(Context context) {
         super(context);
         this.context = context;
         init(null, 0);
     }
 
-    public LineLayoutU(Context context, AttributeSet attrs) {
+    public LineLayoutRing(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.context = context;
         init(attrs, 0);
     }
 
-    public LineLayoutU(Context context, AttributeSet attrs, int defStyle) {
+    public LineLayoutRing(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         this.context = context;
         init(attrs, defStyle);
@@ -87,58 +82,82 @@ public class LineLayoutU extends ViewGroup {
     private void init(AttributeSet attrs, int defStyle) {
         // Load attributes
         final TypedArray a = getContext().obtainStyledAttributes(
-                attrs, R.styleable.LineLayoutU, defStyle, 0);
+                attrs, R.styleable.LineLayoutR, defStyle, 0);
 
-        if (a.hasValue(R.styleable.LineLayoutU_lineDrawableNoPass)) {
+        if (a.hasValue(R.styleable.LineLayoutR_lineDrawableNoPassR)) {
             lineDrawableNoPass = a.getDrawable(
-                    R.styleable.LineLayoutU_lineDrawableNoPass);
+                    R.styleable.LineLayoutR_lineDrawableNoPassR);
         }
-        if (a.hasValue(R.styleable.LineLayoutU_lineDrawablePassed)) {
+        if (a.hasValue(R.styleable.LineLayoutR_lineDrawablePassedR)) {
             lineDrawablePassed = a.getDrawable(
-                    R.styleable.LineLayoutU_lineDrawablePassed);
+                    R.styleable.LineLayoutR_lineDrawablePassedR);
         }
-        if (a.hasValue(R.styleable.LineLayoutU_lineDrawablePassing)) {
+        if (a.hasValue(R.styleable.LineLayoutR_lineDrawablePassingR)) {
             lineDrawablePassing = a.getDrawable(
-                    R.styleable.LineLayoutU_lineDrawablePassing);
+                    R.styleable.LineLayoutR_lineDrawablePassingR);
         }
-        if (a.hasValue(R.styleable.LineLayoutU_pointDrawableNoPass)) {
+        if (a.hasValue(R.styleable.LineLayoutR_pointDrawableNoPassR)) {
             pointDrawableNoPass = a.getDrawable(
-                    R.styleable.LineLayoutU_pointDrawableNoPass);
+                    R.styleable.LineLayoutR_pointDrawableNoPassR);
         } else {
             pointDrawableNoPass = getResources().getDrawable(R.drawable.point_blue);
         }
-        if (a.hasValue(R.styleable.LineLayoutU_lineDrawablePassed)) {
+        if (a.hasValue(R.styleable.LineLayoutR_lineDrawablePassedR)) {
             pointDrawablePassed = a.getDrawable(
-                    R.styleable.LineLayoutU_lineDrawablePassed);
+                    R.styleable.LineLayoutR_lineDrawablePassedR);
         } else {
             pointDrawablePassed = getResources().getDrawable(R.drawable.point_red);
         }
-        if (a.hasValue(R.styleable.LineLayoutU_pointDrawablePassing)) {
+        if (a.hasValue(R.styleable.LineLayoutR_pointDrawablePassingR)) {
             pointDrawablePassing = a.getDrawable(
-                    R.styleable.LineLayoutU_pointDrawablePassing);
+                    R.styleable.LineLayoutR_pointDrawablePassingR);
         } else {
             pointDrawablePassing = getResources().getDrawable(R.drawable.point_yellow);
         }
 
+        if (a.hasValue(R.styleable.LineLayoutR_pointDrawablePassingR)) {
+            pointDrawablePassing = a.getDrawable(
+                    R.styleable.LineLayoutR_pointDrawablePassingR);
+        } else {
+            pointDrawablePassing = getResources().getDrawable(R.drawable.point_yellow);
+        }
+
+        if (a.hasValue(R.styleable.LineLayoutR_leftTopDrawableNoPassR)) {
+            leftTopDrawableNoPassR = a.getDrawable(
+                    R.styleable.LineLayoutR_leftTopDrawableNoPassR);
+        } else {
+            leftTopDrawableNoPassR = getResources().getDrawable(R.drawable.default_r_left_top);
+        }
+
+        if (a.hasValue(R.styleable.LineLayoutR_leftBottomDrawableNoPassR)) {
+            leftBottomDrawableNoPassR = a.getDrawable(
+                    R.styleable.LineLayoutR_leftBottomDrawableNoPassR);
+        } else {
+            leftBottomDrawableNoPassR = getResources().getDrawable(R.drawable.default_r_left_bottom);
+        }
+        if (a.hasValue(R.styleable.LineLayoutR_rightTopDrawableNoPassR)) {
+            rightTopDrawableNoPassR = a.getDrawable(
+                    R.styleable.LineLayoutR_rightTopDrawableNoPassR);
+        } else {
+            rightTopDrawableNoPassR = getResources().getDrawable(R.drawable.default_r_right_top);
+        }
+        if (a.hasValue(R.styleable.LineLayoutR_rightBottomDrawableNoPassR)) {
+            rightBottomDrawableNoPassR = a.getDrawable(
+                    R.styleable.LineLayoutR_rightBottomDrawableNoPassR);
+        } else {
+            rightBottomDrawableNoPassR = getResources().getDrawable(R.drawable.default_r_right_bottom);
+        }
+
 
         int lineDrawableNoPassId = a.getResourceId(
-                R.styleable.LineLayoutU_lineDrawableNoPass, R.drawable.default_u_line_view_img);
+                R.styleable.LineLayoutR_lineDrawableNoPassR, R.drawable.default_u_line_view_img);
         Bitmap lineDrawableNoPassBitmap = BitmapFactory.decodeResource(getResources(), lineDrawableNoPassId);
         lineDrawableNoPassNinePatch = new NinePatch(lineDrawableNoPassBitmap, lineDrawableNoPassBitmap.getNinePatchChunk(), null);
 
-        int uTopDrawableNoPassId = a.getResourceId(
-                R.styleable.LineLayoutU_uTopDrawableNoPass, R.drawable.default_u_mode_top_img);
-        Bitmap uTopDrawableNoPassBitmap = BitmapFactory.decodeResource(getResources(), uTopDrawableNoPassId);
-        uTopDrawableNoPassNinePatch = new NinePatch(uTopDrawableNoPassBitmap, uTopDrawableNoPassBitmap.getNinePatchChunk(), null);
-
-        int uBottomDrawableNoPassId = a.getResourceId(
-                R.styleable.LineLayoutU_uBottomDrawableNoPass, R.drawable.default_u_mode_bottom_img);
-        Bitmap uBottomDrawableNoPassBitmap = BitmapFactory.decodeResource(getResources(), uBottomDrawableNoPassId);
-        uBottomDrawableNoPassNinePatch = new NinePatch(uBottomDrawableNoPassBitmap, uBottomDrawableNoPassBitmap.getNinePatchChunk(), null);
 
         rect = new Rect();
 
-        remainMode = a.getInt(R.styleable.LineLayoutU_remainMode, remainMode);
+//        remainMode = a.getInt(R.styleable.LineLayoutR_remainMode, remainMode);
         a.recycle();
     }
 
@@ -153,8 +172,7 @@ public class LineLayoutU extends ViewGroup {
         int contentWidth = totalWidth - paddingLeft - paddingRight;
         int contentHeight = totalHeight - paddingTop - paddingBottom;
         int count = getChildCount();
-        topPerWidth = (contentWidth - offsetLeft) / topPointNum;
-        bottomPerWidth = (contentWidth - offsetLeft) / bottomPointNum;
+
         int left, top, right, bottom;
         int tipsNameTop = (int) (paddingTop + contentHeight / 2f - tipsNameLayoutHeight / 2f - lineLayoutHeight);
         int tipsNameBottom = (int) (paddingTop + contentHeight / 2f + tipsNameLayoutHeight / 2f + lineLayoutHeight);
@@ -165,8 +183,9 @@ public class LineLayoutU extends ViewGroup {
             if (child instanceof StationNameView) {
                 int childMeasureWidth = child.getMeasuredWidth();
                 int childMeasureHeight = child.getMeasuredHeight();
-                offsetLeft = (childMeasureWidth > pointViewWidth ? childMeasureWidth : pointViewWidth) / 2;
-
+                offsetLeft = tipsNameLayoutHeight / 2 + lineLayoutHeight / 2 + lineViewHeight / 2;
+                topPerWidth = (contentWidth - offsetLeft - offsetRight) / (topPointNum - 1);
+                bottomPerWidth = (contentWidth - offsetLeft - offsetRight) / (bottomPointNum - 1);
                 j++;
                 if (j < topPointNum) {
                     //如果一行没有排满，继续往右排列
@@ -186,7 +205,7 @@ public class LineLayoutU extends ViewGroup {
                 }
                 child.layout(left, top, right, bottom);
             } else {
-                child.layout(paddingLeft, tipsNameTop, contentWidth + paddingLeft - offsetRight, tipsNameBottom);
+                child.layout(paddingLeft+offsetLeft, tipsNameTop, contentWidth + paddingLeft - offsetRight, tipsNameBottom);
             }
         }
     }
@@ -195,7 +214,8 @@ public class LineLayoutU extends ViewGroup {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         // 计算出所有的childView的宽和高
         final int size = getChildCount();
-        offsetRight = tipsNameLayoutHeight / 2 + lineLayoutHeight;
+        offsetRight = tipsNameLayoutHeight / 2 + lineLayoutHeight / 2 + lineViewHeight / 2;
+        offsetLeft = tipsNameLayoutHeight / 2 + lineLayoutHeight / 2 + lineViewHeight / 2;
         for (int i = 0; i < size; ++i) {
             final View child = getChildAt(i);
             if (child.getVisibility() != GONE) {
@@ -203,7 +223,7 @@ public class LineLayoutU extends ViewGroup {
                     measureChild(child, widthMeasureSpec, heightMeasureSpec);
                 } else {
                     int widthSize = MeasureSpec.getSize(widthMeasureSpec);
-                    int widthMeasureSpec_t = MeasureSpec.makeMeasureSpec(widthSize - offsetRight, MeasureSpec.EXACTLY);
+                    int widthMeasureSpec_t = MeasureSpec.makeMeasureSpec(widthSize - offsetRight - offsetLeft, MeasureSpec.EXACTLY);
                     measureChild(child, widthMeasureSpec_t, heightMeasureSpec);
                 }
             }
@@ -229,77 +249,81 @@ public class LineLayoutU extends ViewGroup {
         int lineBottom = (int) (paddingTop + contentHeight / 2f + tipsNameLayoutHeight / 2f + lineLayoutHeight / 2f);
 
         for (int i = 0; i < topPointNum; i++) {
-            if (i == 0) {
-                topLinePoints[i * 4] = paddingLeft;
+            if (i != topPointNum - 1) {
+                topLinePoints[i * 4] = paddingLeft + ((i) * topPerWidth);
                 topLinePoints[i * 4 + 1] = lineTop;
-                topLinePoints[i * 4 + 2] = paddingLeft + (i) * topPerWidth;
+                topLinePoints[i * 4 + 2] = paddingLeft + ((i + 1.0f) * topPerWidth);
                 topLinePoints[i * 4 + 3] = lineTop;
             }
-            int j = i + 1;
-            topLinePoints[j * 4] = paddingLeft + ((i) * topPerWidth);
-            topLinePoints[j * 4 + 1] = lineTop;
-            if (i == topPointNum - 1) {
-                topLinePoints[j * 4 + 2] = paddingLeft + ((i + 0.5f) * topPerWidth);
-            } else {
-                topLinePoints[j * 4 + 2] = paddingLeft + ((i + 1.0f) * topPerWidth);
-            }
-            topLinePoints[j * 4 + 3] = lineTop;
-
             topPointPoints[i * 2] = paddingLeft + (i) * topPerWidth;
             topPointPoints[i * 2 + 1] = lineTop;
         }
 
-        centerPointPoints[0] = getWidth()-paddingRight;
+        centerPointPoints[0] = getPaddingLeft();
         centerPointPoints[1] = paddingTop + contentHeight / 2;
+        centerPointPoints[2] = getWidth() - paddingRight;
+        centerPointPoints[3] = paddingTop + contentHeight / 2;
 
         for (int i = 0; i < bottomPointNum; i++) {
-            if (i == 0) {
-                bottomLinePoints[i * 4] = paddingLeft;
-                bottomLinePoints[i * 4 + 1] = lineBottom;
-                bottomLinePoints[i * 4 + 2] = paddingLeft + (i) * bottomPerWidth;
-                bottomLinePoints[i * 4 + 3] = lineBottom;
+            if (i != bottomPointNum - 1) {
+                bottomLinePoints[i * 4] = paddingLeft + ((i) * bottomPerWidth);
+                bottomLinePoints[i * 4 + 1] = lineTop;
+                bottomLinePoints[i * 4 + 2] = paddingLeft + ((i + 1.0f) * bottomPerWidth);
+                bottomLinePoints[i * 4 + 3] = lineTop;
             }
-            int j = i + 1;
-            bottomLinePoints[j * 4] = paddingLeft + ((i) * bottomPerWidth);
-            bottomLinePoints[j * 4 + 1] = lineBottom;
-            if (i == bottomPointNum - 1) {
-                bottomLinePoints[j * 4 + 2] = paddingLeft + ((i + 0.5f) * bottomPerWidth);
-            } else {
-                bottomLinePoints[j * 4 + 2] = paddingLeft + ((i + 1.0f) * bottomPerWidth);
-            }
-            bottomLinePoints[j * 4 + 3] = lineBottom;
-
             bottomPointPoints[i * 2] = paddingLeft + (i) * bottomPerWidth;
-            bottomPointPoints[i * 2 + 1] = lineBottom;
+            bottomPointPoints[i * 2 + 1] = lineTop;
         }
 
-        for (int i = 1; i < topPointNum; i++) {
-            rect.left = (int) (topLinePoints[i * 4]);
-            rect.top = (int) (lineTop - lineViewHeight / 2f);
-            rect.right = (int) (topLinePoints[i * 4 + 2]);
-            rect.bottom = (int) (lineTop + lineViewHeight / 2f);
-            lineDrawableNoPassNinePatch.draw(canvas, rect);
-            if (i == topPointNum - 1) {
-                rect.left = (int) (topLinePoints[i * 4 + 4]);
+        for (int i = 0; i < topPointNum; i++) {
+            if (i==0){
+                rect.left = (int) centerPointPoints[0];
                 rect.top = (int) (lineTop - lineViewHeight / 2f);
-                rect.right = (int) centerPointPoints[0];
+                rect.right = (int) (topLinePoints[i * 4]);
                 rect.bottom = (int) centerPointPoints[1];
-                uTopDrawableNoPassNinePatch.draw(canvas, rect);
+                leftTopDrawableNoPassR.setBounds(rect);
+                leftTopDrawableNoPassR.draw(canvas);
+            }
+            if (i != topPointNum - 1) {
+                rect.left = (int) (topLinePoints[i * 4]);
+                rect.top = (int) (lineTop - lineViewHeight / 2f);
+                rect.right = (int) (topLinePoints[i * 4 + 2]);
+                rect.bottom = (int) (lineTop + lineViewHeight / 2f);
+                lineDrawableNoPassNinePatch.draw(canvas, rect);
+            }
+            if (i == topPointNum - 2) {
+                rect.left = (int) (topLinePoints[i * 4 + 2]);
+                rect.top = (int) (lineTop - lineViewHeight / 2f);
+                rect.right = (int) centerPointPoints[2];
+                rect.bottom = (int) centerPointPoints[3];
+                rightTopDrawableNoPassR.setBounds(rect);
+                rightTopDrawableNoPassR.draw(canvas);
             }
         }
 
-        for (int i = 1; i < bottomPointNum; i++) {
-            rect.left = (int) (bottomLinePoints[i * 4]);
-            rect.top = (int) (lineBottom - lineViewHeight / 2f);
-            rect.right = (int) (bottomLinePoints[i * 4 + 2]);
-            rect.bottom = (int) (lineBottom + lineViewHeight / 2f);
-            lineDrawableNoPassNinePatch.draw(canvas, rect);
-            if (i == bottomPointNum - 1) {
-                rect.left = (int) (bottomLinePoints[i * 4+2]);
+        for (int i = 0; i < bottomPointNum; i++) {
+            if (i==0){
+                rect.left = (int) centerPointPoints[0];
                 rect.top = (int) centerPointPoints[1];
-                rect.right =(int) centerPointPoints[0];
+                rect.right = (int) (bottomLinePoints[i * 4]);
                 rect.bottom = (int) (lineBottom + lineViewHeight / 2f);
-                uBottomDrawableNoPassNinePatch.draw(canvas, rect);
+                leftBottomDrawableNoPassR.setBounds(rect);
+                leftBottomDrawableNoPassR.draw(canvas);
+            }
+            if (i != bottomPointNum - 1) {
+                rect.left = (int) (bottomLinePoints[i * 4]);
+                rect.top = (int) (lineBottom - lineViewHeight / 2f);
+                rect.right = (int) (bottomLinePoints[i * 4 + 2]);
+                rect.bottom = (int) (lineBottom + lineViewHeight / 2f);
+                lineDrawableNoPassNinePatch.draw(canvas, rect);
+            }
+            if (i == bottomPointNum - 2) {
+                rect.left = (int) (bottomLinePoints[i * 4 + 2]);
+                rect.top = (int) centerPointPoints[3];
+                rect.right = (int) centerPointPoints[2];
+                rect.bottom = (int) (lineBottom + lineViewHeight / 2f);
+                rightBottomDrawableNoPassR.setBounds(rect);
+                rightBottomDrawableNoPassR.draw(canvas);
             }
         }
 
@@ -343,11 +367,11 @@ public class LineLayoutU extends ViewGroup {
             topPointNum = listSize / 2;
             bottomPointNum = listSize / 2 + 1;
         }
-        topLinePoints = new float[(topPointNum + 1) * 4];
-        bottomLinePoints = new float[(bottomPointNum + 1) * 4];
-        topPointPoints = new float[(topPointNum + 1) * 2];
-        centerPointPoints = new float[2];
-        bottomPointPoints = new float[(bottomPointNum + 1) * 2];
+        topLinePoints = new float[(topPointNum - 1) * 4];
+        bottomLinePoints = new float[(bottomPointNum - 1) * 4];
+        topPointPoints = new float[topPointNum * 2];
+        bottomPointPoints = new float[bottomPointNum * 2];
+        centerPointPoints = new float[4];
         View view = View.inflate(context, R.layout.view_next_station_tips, null);
         addView(view);
     }
