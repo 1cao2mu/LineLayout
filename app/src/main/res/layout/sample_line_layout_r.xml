@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.example.linelayout.LineLayoutRing
+    <com.example.linelayout.LineLayoutR
         android:id="@+id/line_r"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

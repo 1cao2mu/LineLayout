@@ -5,6 +5,7 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -16,15 +17,19 @@ import android.view.View;
  */
 public class TipsNameView extends View {
     public static final String TAG = "TipsNameView";
-    private String tipsNameString = "A因为基线上方为负，所以ascent和top的值都是负数，而且top要大于ascent，原因是要为符号留出位置。B"; // 站名
+    //可设置参数
+    private String tipsNameString = ""; // 内容
     private int tipsNameColor = Color.RED; // 文字颜色
     private float tipsNameSize = 35; // 文字大小
+    private int tipsNameOffset = 3; //偏移几个文字
+    private int tipsNameSpeed = 1; //滚动速度
+    private boolean tipsNameBold = true; //滚动速度
 
     private TextPaint mTextPaint;//文字画笔
     private float oneTextWidth;//一个字的宽度
     private float allTextWidth;//所有字的宽度
     private float oneTextHeight;//一个字的高度
-    private boolean isScorll = false;
+    private boolean isScroll = false;
 
     public TipsNameView(Context context) {
         super(context);
@@ -45,20 +50,33 @@ public class TipsNameView extends View {
         // Load attributes
         final TypedArray a = getContext().obtainStyledAttributes(
                 attrs, R.styleable.TipsNameView, defStyle, 0);
-        if (a.hasValue(R.styleable.TipsNameView_tipsName))
+        if (a.hasValue(R.styleable.TipsNameView_tipsName)) {
             tipsNameString = a.getString(
                     R.styleable.TipsNameView_tipsName);
-        tipsNameColor = a.getColor(
-                R.styleable.TipsNameView_tipsNameColor,
+        } else {
+            tipsNameString = "";
+        }
+        Log.e(TAG, "init:" + tipsNameString);
+        tipsNameColor = a.getColor(R.styleable.TipsNameView_tipsNameColor,
                 tipsNameColor);
-        tipsNameSize = a.getDimension(
-                R.styleable.TipsNameView_tipsNameSize,
+        tipsNameSize = a.getDimension(R.styleable.TipsNameView_tipsNameSize,
                 tipsNameSize);
+        tipsNameOffset = a.getInteger(R.styleable.TipsNameView_tipsNameOffset,
+                tipsNameOffset);
+        tipsNameSpeed = a.getInteger(R.styleable.TipsNameView_tipsNameSpeed,
+                tipsNameSpeed);
+        tipsNameBold = a.getBoolean(R.styleable.TipsNameView_tipsNameSpeed,
+                tipsNameBold);
         a.recycle();
 
         mTextPaint = new TextPaint();
         mTextPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
         mTextPaint.setTextAlign(Paint.Align.LEFT);
+        if (tipsNameBold) {
+            mTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
+        } else {
+            mTextPaint.setTypeface(Typeface.DEFAULT);
+        }
     }
 
 
@@ -68,14 +86,16 @@ public class TipsNameView extends View {
         oneTextWidth = mTextPaint.measureText("测");//计算一个字的宽度
         allTextWidth = mTextPaint.measureText(tipsNameString);//计算所有字的宽度
         oneTextHeight = mTextPaint.descent() - mTextPaint.ascent();//计算一个字的高度
-        Log.e(TAG, "ascent: " + mTextPaint.ascent());
-        Log.e(TAG, "descent: " + mTextPaint.descent());
-        Log.e(TAG, "oneTextHeight: " + oneTextHeight);
     }
+
+    private int widthMeasureSpec;
+    private int heightMeasureSpec;
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        this.widthMeasureSpec=widthMeasureSpec;
+        this.heightMeasureSpec=heightMeasureSpec;
         invalidateTextPaintAndMeasurements();
         // 获得它的父容器为它设置的测量模式和大小
         int widthMode = MeasureSpec.getMode(widthMeasureSpec);
@@ -87,11 +107,11 @@ public class TipsNameView extends View {
         Log.e(TAG, "onMeasure widthSize: " + widthSize);
         Log.e(TAG, "onMeasure heightSize: " + heightSize);
         if (allTextWidth > widthSize) {
-            isScorll = true;
-            dx = (int) (3*oneTextWidth);
+            isScroll = true;
+            dx = (int) (tipsNameOffset * oneTextWidth);
         } else {
-            isScorll = false;
-            dx=0;
+            isScroll = false;
+            dx = 0;
         }
         int needWidth = (int) allTextWidth;
         if (widthMode == MeasureSpec.AT_MOST && allTextWidth > widthSize) {
@@ -113,15 +133,15 @@ public class TipsNameView extends View {
         int contentWidth = getWidth();
         int contentHeight = getHeight();
         int needWidth = (int) (oneTextWidth * tipsNameString.length());
-        if (isScorll) {
+        if (isScroll) {
             canvas.drawText(tipsNameString,
                     dx,
                     contentHeight - (int) mTextPaint.descent(),
                     mTextPaint);
-            if (dx <= contentWidth - allTextWidth-(int) (3*oneTextWidth)) {
-                dx = (int) (3*oneTextWidth);
+            if (dx <= contentWidth - allTextWidth - (int) (tipsNameOffset * oneTextWidth)) {
+                dx = (int) (tipsNameOffset * oneTextWidth);
             } else {
-                dx--;
+                dx = dx - tipsNameSpeed;
             }
             invalidate();
         } else {
@@ -130,5 +150,30 @@ public class TipsNameView extends View {
                     contentHeight - (int) mTextPaint.descent(),
                     mTextPaint);
         }
+    }
+
+    public void setTipsNameString(String tipsNameString) {
+        this.tipsNameString = tipsNameString;
+        invalidate();
+    }
+
+    public void setTipsNameColor(int tipsNameColor) {
+        this.tipsNameColor = tipsNameColor;
+    }
+
+    public void setTipsNameSize(float tipsNameSize) {
+        this.tipsNameSize = tipsNameSize;
+    }
+
+    public void setTipsNameOffset(int tipsNameOffset) {
+        this.tipsNameOffset = tipsNameOffset;
+    }
+
+    public void setTipsNameSpeed(int tipsNameSpeed) {
+        this.tipsNameSpeed = tipsNameSpeed;
+    }
+
+    public void setTipsNameBold(boolean tipsNameBold) {
+        this.tipsNameBold = tipsNameBold;
     }
 }

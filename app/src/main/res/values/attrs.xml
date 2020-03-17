@@ -1,5 +1,5 @@
 <resources>
-    <declare-styleable name="LineLayout">
+    <declare-styleable name="LineLayoutL">
         <attr name="pointDrawable" format="color|reference" />
         <attr name="lineDrawable" format="color|reference" />
         <attr name="startDrawable" format="reference" />
@@ -29,7 +29,9 @@
         <attr name="tipsName" format="string" />
         <attr name="tipsNameSize" format="dimension" />
         <attr name="tipsNameColor" format="color" />
-        <attr name="tipsNameLine" format="integer" />
+        <attr name="tipsNameOffset" format="integer" />
+        <attr name="tipsNameSpeed" format="integer" />
+        <attr name="tipsNameBold" format="boolean" />
     </declare-styleable>
 
     <declare-styleable name="LineLayoutU">

@@ -8,37 +8,29 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.NinePatch;
 import android.graphics.Paint;
-import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.drawable.AnimationDrawable;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.NinePatchDrawable;
 import android.os.Handler;
 import android.os.Message;
-import android.text.Layout;
-import android.text.StaticLayout;
-import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * 自定义线路组件
  */
-public class LineLayout extends ViewGroup {
+public class LineLayoutL extends ViewGroup {
     //可以设置的参数变量
     private static final int STARTENDMOD_TOP = 0;
     private static final int STARTENDMOD_CENTER = 1;
@@ -98,20 +90,25 @@ public class LineLayout extends ViewGroup {
         }
     });
 
+    //子组件和相关
+    private ImageView iv_next_tip;
+    private TextView tv_next_tip;
+    private TipsNameView tv_change_message;
 
-    public LineLayout(Context context) {
+
+    public LineLayoutL(Context context) {
         super(context);
         this.context = context;
         init(null, 0);
     }
 
-    public LineLayout(Context context, AttributeSet attrs) {
+    public LineLayoutL(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.context = context;
         init(attrs, 0);
     }
 
-    public LineLayout(Context context, AttributeSet attrs, int defStyle) {
+    public LineLayoutL(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         this.context = context;
         init(attrs, defStyle);
@@ -168,16 +165,16 @@ public class LineLayout extends ViewGroup {
     private void init(AttributeSet attrs, int defStyle) {
         // Load attributes
         final TypedArray a = getContext().obtainStyledAttributes(
-                attrs, R.styleable.LineLayout, defStyle, 0);
+                attrs, R.styleable.LineLayoutL, defStyle, 0);
 
-        if (a.hasValue(R.styleable.LineLayout_enterOutDrawable)) {
+        if (a.hasValue(R.styleable.LineLayoutL_enterOutDrawable)) {
             enterOutDrawable = a.getDrawable(
-                    R.styleable.LineLayout_enterOutDrawable);
+                    R.styleable.LineLayoutL_enterOutDrawable);
         }
 
-        if (a.hasValue(R.styleable.LineLayout_pointAnim)) {
+        if (a.hasValue(R.styleable.LineLayoutL_pointAnim)) {
             Drawable drawable = a.getDrawable(
-                    R.styleable.LineLayout_pointAnim);
+                    R.styleable.LineLayoutL_pointAnim);
             if (drawable instanceof AnimationDrawable) {
                 pointAnim = (AnimationDrawable) drawable;
                 if (pointAnim.getNumberOfFrames() > 0) {
@@ -185,39 +182,39 @@ public class LineLayout extends ViewGroup {
                 }
             }
         }
-        if (a.hasValue(R.styleable.LineLayout_startDrawable)) {
+        if (a.hasValue(R.styleable.LineLayoutL_startDrawable)) {
             startDrawable = a.getDrawable(
-                    R.styleable.LineLayout_startDrawable);
+                    R.styleable.LineLayoutL_startDrawable);
         }
-        if (a.hasValue(R.styleable.LineLayout_endDrawable)) {
+        if (a.hasValue(R.styleable.LineLayoutL_endDrawable)) {
             endDrawable = a.getDrawable(
-                    R.styleable.LineLayout_endDrawable);
+                    R.styleable.LineLayoutL_endDrawable);
         }
 
-        enterOutWidth = a.getDimension(R.styleable.LineLayout_enterOutWidth, enterOutWidth);
-        enterOutHeight = a.getDimension(R.styleable.LineLayout_enterOutHeight, enterOutHeight);
-        startEndWidth = a.getDimension(R.styleable.LineLayout_startEndWidth, startEndWidth);
-        startEndHeight = a.getDimension(R.styleable.LineLayout_startEndHeight, startEndHeight);
-        startEndMod = a.getInt(R.styleable.LineLayout_startEndMod, startEndMod);
-        enterOutRate = a.getInt(R.styleable.LineLayout_enterOutRate, enterOutRate);
+        enterOutWidth = a.getDimension(R.styleable.LineLayoutL_enterOutWidth, enterOutWidth);
+        enterOutHeight = a.getDimension(R.styleable.LineLayoutL_enterOutHeight, enterOutHeight);
+        startEndWidth = a.getDimension(R.styleable.LineLayoutL_startEndWidth, startEndWidth);
+        startEndHeight = a.getDimension(R.styleable.LineLayoutL_startEndHeight, startEndHeight);
+        startEndMod = a.getInt(R.styleable.LineLayoutL_startEndMod, startEndMod);
+        enterOutRate = a.getInt(R.styleable.LineLayoutL_enterOutRate, enterOutRate);
 
 
-        if (a.hasValue(R.styleable.LineLayout_pointDrawable)) {
+        if (a.hasValue(R.styleable.LineLayoutL_pointDrawable)) {
             pointDrawable = a.getDrawable(
-                    R.styleable.LineLayout_pointDrawable);
+                    R.styleable.LineLayoutL_pointDrawable);
             if (pointDrawable != null)
                 pointDrawable.setCallback(this);
         }
-        if (a.hasValue(R.styleable.LineLayout_lineDrawable)) {
+        if (a.hasValue(R.styleable.LineLayoutL_lineDrawable)) {
             lineDrawable = a.getDrawable(
-                    R.styleable.LineLayout_lineDrawable);
+                    R.styleable.LineLayoutL_lineDrawable);
             if (lineDrawable != null) {
                 lineDrawable.setCallback(this);
             }
             lineBitmapIsNinePatch = lineDrawable != null && lineDrawable instanceof NinePatchDrawable;
             if (lineBitmapIsNinePatch) {
                 int lineDrawableId = a.getResourceId(
-                        R.styleable.LineLayout_lineDrawable, R.drawable.ic_launcher_2);
+                        R.styleable.LineLayoutL_lineDrawable, R.drawable.ic_launcher_2);
                 lineBitmap = BitmapFactory.decodeResource(getResources(), lineDrawableId);
                 ninePatch = new NinePatch(lineBitmap, lineBitmap.getNinePatchChunk(), null);
             }
@@ -373,7 +370,22 @@ public class LineLayout extends ViewGroup {
         linePoints = new float[(listData.size() + 1) * 4];
         stationPoints = new float[listData.size() * 2];
         View view = View.inflate(context, R.layout.view_next_station_tips, null);
+        iv_next_tip = view.findViewById(R.id.iv_next_tip);
+        tv_next_tip = view.findViewById(R.id.tv_next_tip);
+        tv_change_message = view.findViewById(R.id.tv_change_message);
         addView(view);
+    }
+
+    public ImageView getIv_next_tip() {
+        return iv_next_tip;
+    }
+
+    public TextView getTv_next_tip() {
+        return tv_next_tip;
+    }
+
+    public TipsNameView getTv_change_message() {
+        return tv_change_message;
     }
 
 

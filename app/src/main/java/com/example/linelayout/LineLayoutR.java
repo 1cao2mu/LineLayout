@@ -13,6 +13,8 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +22,7 @@ import java.util.List;
 /**
  * 自定义线路组件-环型
  */
-public class LineLayoutRing extends ViewGroup {
+public class LineLayoutR extends ViewGroup {
     // TODO: 2020/3/13 以后统一加注释
     //静态变量
     private static final int REMAINMODE_TOPMAX = 0;
@@ -61,19 +63,24 @@ public class LineLayoutRing extends ViewGroup {
     private int offsetLeft = 0;
     private int offsetRight = 0;
 
-    public LineLayoutRing(Context context) {
+    //子组件和相关
+    private ImageView iv_next_tip;
+    private TextView tv_next_tip;
+    private TipsNameView tv_change_message;
+
+    public LineLayoutR(Context context) {
         super(context);
         this.context = context;
         init(null, 0);
     }
 
-    public LineLayoutRing(Context context, AttributeSet attrs) {
+    public LineLayoutR(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.context = context;
         init(attrs, 0);
     }
 
-    public LineLayoutRing(Context context, AttributeSet attrs, int defStyle) {
+    public LineLayoutR(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         this.context = context;
         init(attrs, defStyle);
@@ -205,7 +212,7 @@ public class LineLayoutRing extends ViewGroup {
                 }
                 child.layout(left, top, right, bottom);
             } else {
-                child.layout(paddingLeft+offsetLeft, tipsNameTop, contentWidth + paddingLeft - offsetRight, tipsNameBottom);
+                child.layout(paddingLeft + offsetLeft, tipsNameTop, contentWidth + paddingLeft - offsetRight, tipsNameBottom);
             }
         }
     }
@@ -276,7 +283,7 @@ public class LineLayoutRing extends ViewGroup {
         }
 
         for (int i = 0; i < topPointNum; i++) {
-            if (i==0){
+            if (i == 0) {
                 rect.left = (int) centerPointPoints[0];
                 rect.top = (int) (lineTop - lineViewHeight / 2f);
                 rect.right = (int) (topLinePoints[i * 4]);
@@ -302,7 +309,7 @@ public class LineLayoutRing extends ViewGroup {
         }
 
         for (int i = 0; i < bottomPointNum; i++) {
-            if (i==0){
+            if (i == 0) {
                 rect.left = (int) centerPointPoints[0];
                 rect.top = (int) centerPointPoints[1];
                 rect.right = (int) (bottomLinePoints[i * 4]);
@@ -373,6 +380,22 @@ public class LineLayoutRing extends ViewGroup {
         bottomPointPoints = new float[bottomPointNum * 2];
         centerPointPoints = new float[4];
         View view = View.inflate(context, R.layout.view_next_station_tips, null);
+        iv_next_tip = view.findViewById(R.id.iv_next_tip);
+        tv_next_tip = view.findViewById(R.id.tv_next_tip);
+        tv_change_message = view.findViewById(R.id.tv_change_message);
         addView(view);
+    }
+
+
+    public ImageView getIv_next_tip() {
+        return iv_next_tip;
+    }
+
+    public TextView getTv_next_tip() {
+        return tv_next_tip;
+    }
+
+    public TipsNameView getTv_change_message() {
+        return tv_change_message;
     }
 }

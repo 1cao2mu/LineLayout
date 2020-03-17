@@ -2,16 +2,16 @@ package com.example.linelayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.graphics.drawable.AnimatedImageDrawable;
 import android.os.Bundle;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    private LineLayout line;
+    private LineLayoutL line;
     private LineLayoutU line_u;
-    private LineLayoutRing line_r;
+    private LineLayoutR line_r;
     private List<String> listData = new ArrayList<>();//线路数据
 
     @Override
@@ -34,10 +34,11 @@ public class MainActivity extends AppCompatActivity {
             line_u.setListData(listData);
         }
         if (line_r!=null){
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < 11; i++) {
                 listData.add("第" + i + "站");
             }
             line_r.setListData(listData);
         }
+
     }
 }

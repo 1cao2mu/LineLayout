@@ -13,6 +13,8 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,6 +67,11 @@ public class LineLayoutU extends ViewGroup {
     private Rect rect;
     private int offsetLeft = 0;
     private int offsetRight = 0;
+
+    //子组件和相关
+    private ImageView iv_next_tip;
+    private TextView tv_next_tip;
+    private TipsNameView tv_change_message;
 
     public LineLayoutU(Context context) {
         super(context);
@@ -349,6 +356,21 @@ public class LineLayoutU extends ViewGroup {
         centerPointPoints = new float[2];
         bottomPointPoints = new float[(bottomPointNum + 1) * 2];
         View view = View.inflate(context, R.layout.view_next_station_tips, null);
+        iv_next_tip = view.findViewById(R.id.iv_next_tip);
+        tv_next_tip = view.findViewById(R.id.tv_next_tip);
+        tv_change_message = view.findViewById(R.id.tv_change_message);
         addView(view);
+    }
+
+    public ImageView getIv_next_tip() {
+        return iv_next_tip;
+    }
+
+    public TextView getTv_next_tip() {
+        return tv_next_tip;
+    }
+
+    public TipsNameView getTv_change_message() {
+        return tv_change_message;
     }
 }
