@@ -1,7 +1,12 @@
 <resources>
     <declare-styleable name="LineLayoutL">
-        <attr name="pointDrawable" format="color|reference" />
-        <attr name="lineDrawable" format="color|reference" />
+        <attr name="pointDrawableNoPassL" format="color|reference" />
+        <attr name="pointDrawablePassedL" format="color|reference" />
+        <attr name="pointDrawablePassingL" format="color|reference" />
+        <attr name="lineDrawableNoPassL" format="color|reference" />
+        <attr name="lineDrawablePassedL" format="color|reference" />
+        <attr name="lineDrawablePassingL" format="color|reference" />
+
         <attr name="startDrawable" format="reference" />
         <attr name="endDrawable" format="reference" />
         <attr name="startEndMod" format="enum">

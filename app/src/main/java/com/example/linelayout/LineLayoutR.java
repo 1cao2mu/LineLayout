@@ -34,12 +34,13 @@ public class LineLayoutR extends ViewGroup {
     private NinePatch lineDrawableNoPassNinePatch;
     private NinePatch lineDrawablePassedNinePatch;
     private NinePatch lineDrawablePassingNinePatch;
-
-    private int lineLayoutHeight = 40;
-    private int lineViewHeight = 22;
     private Drawable pointDrawableNoPass;
     private Drawable pointDrawablePassed;
     private Drawable pointDrawablePassing;
+
+    private int lineLayoutHeight = 40;
+    private int lineViewHeight = 22;
+
     private int pointViewHeight = 30;
     private int pointViewWidth = 30;
     private int tipsNameLayoutHeight = 100;

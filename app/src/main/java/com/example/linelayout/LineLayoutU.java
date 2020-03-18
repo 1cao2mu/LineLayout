@@ -67,6 +67,8 @@ public class LineLayoutU extends ViewGroup {
     private Rect rect;
     private int offsetLeft = 0;
     private int offsetRight = 0;
+    private int stopNumber = -1;
+    private int stopType = -1;//0是进站 1是出站
 
     //子组件和相关
     private ImageView iv_next_tip;
@@ -372,5 +374,15 @@ public class LineLayoutU extends ViewGroup {
 
     public TipsNameView getTv_change_message() {
         return tv_change_message;
+    }
+
+    public void setStopNumber(int stopNumber, int stopType) {
+        this.stopType = stopType;
+        if (stopType == 1) {
+            this.stopNumber = stopNumber + 1;
+        } else {
+            this.stopNumber = stopNumber;
+        }
+        handleListData();
     }
 }

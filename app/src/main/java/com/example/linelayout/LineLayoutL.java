@@ -36,7 +36,12 @@ public class LineLayoutL extends ViewGroup {
     private float tipsNameLayoutHeight = 100;
     private int lineLayoutHeight = 40;
     private int lineViewHeight = 22;
-
+    private NinePatch lineDrawableNoPassNinePatch;
+    private NinePatch lineDrawablePassedNinePatch;
+    private NinePatch lineDrawablePassingNinePatch;
+    private Drawable pointDrawableNoPass;
+    private Drawable pointDrawablePassed;
+    private Drawable pointDrawablePassing;
 
     private int stationNameNoPassColor = Color.BLUE;
     private int stationNamePassedColor = Color.RED;
@@ -63,10 +68,6 @@ public class LineLayoutL extends ViewGroup {
     private float enterOutWidth = 40;
     private float enterOutHeight = 40;
     private int enterOutRate = 3;
-    private Drawable pointDrawable;
-    private Bitmap lineBitmap;
-    private Drawable lineDrawable;
-    private Boolean lineBitmapIsNinePatch = false;
     //需要使用的局部变量
     private float perWidth;//每个站点所需要占的大小
     private Context context;
@@ -74,6 +75,8 @@ public class LineLayoutL extends ViewGroup {
     private float[] stationPoints;
     private float stationOneTextWidth;
     private List<String> listData = new ArrayList<>();//线路数据
+    private Rect rect;
+
 
 
     private Handler handler = new Handler(new Handler.Callback() {
@@ -175,8 +178,6 @@ public class LineLayoutL extends ViewGroup {
                 getDefaultSize(getSuggestedMinimumHeight(), heightMeasureSpec));
     }
 
-    private NinePatch ninePatch;
-    private Rect rect;
 
     private void init(AttributeSet attrs, int defStyle) {
         // Load attributes
@@ -214,28 +215,38 @@ public class LineLayoutL extends ViewGroup {
         startEndMod = a.getInt(R.styleable.LineLayoutL_startEndMod, startEndMod);
         enterOutRate = a.getInt(R.styleable.LineLayoutL_enterOutRate, enterOutRate);
 
+        if (a.hasValue(R.styleable.LineLayoutL_pointDrawableNoPassL)) {
+            pointDrawableNoPass = a.getDrawable(
+                    R.styleable.LineLayoutL_pointDrawableNoPassL);
+        } else {
+            pointDrawableNoPass = getResources().getDrawable(R.drawable.point_blue);
+        }
+        if (a.hasValue(R.styleable.LineLayoutL_lineDrawablePassedL)) {
+            pointDrawablePassed = a.getDrawable(
+                    R.styleable.LineLayoutL_lineDrawablePassedL);
+        } else {
+            pointDrawablePassed = getResources().getDrawable(R.drawable.point_red);
+        }
+        if (a.hasValue(R.styleable.LineLayoutL_pointDrawablePassingL)) {
+            pointDrawablePassing = a.getDrawable(
+                    R.styleable.LineLayoutL_pointDrawablePassingL);
+        } else {
+            pointDrawablePassing = getResources().getDrawable(R.drawable.point_yellow);
+        }
 
-        if (a.hasValue(R.styleable.LineLayoutL_pointDrawable)) {
-            pointDrawable = a.getDrawable(
-                    R.styleable.LineLayoutL_pointDrawable);
-            if (pointDrawable != null)
-                pointDrawable.setCallback(this);
-        }
-        if (a.hasValue(R.styleable.LineLayoutL_lineDrawable)) {
-            lineDrawable = a.getDrawable(
-                    R.styleable.LineLayoutL_lineDrawable);
-            if (lineDrawable != null) {
-                lineDrawable.setCallback(this);
-            }
-            lineBitmapIsNinePatch = lineDrawable != null && lineDrawable instanceof NinePatchDrawable;
-            if (lineBitmapIsNinePatch) {
-                int lineDrawableId = a.getResourceId(
-                        R.styleable.LineLayoutL_lineDrawable, R.drawable.ic_launcher_2);
-                lineBitmap = BitmapFactory.decodeResource(getResources(), lineDrawableId);
-                ninePatch = new NinePatch(lineBitmap, lineBitmap.getNinePatchChunk(), null);
-            }
-            rect = new Rect();
-        }
+        int lineDrawableNoPassId = a.getResourceId(
+                R.styleable.LineLayoutL_lineDrawableNoPassL, R.drawable.default_r_line_view_img_no_pass);
+        Bitmap lineDrawableNoPassBitmap = BitmapFactory.decodeResource(getResources(), lineDrawableNoPassId);
+        lineDrawableNoPassNinePatch = new NinePatch(lineDrawableNoPassBitmap, lineDrawableNoPassBitmap.getNinePatchChunk(), null);
+        int lineDrawablePassedId = a.getResourceId(
+                R.styleable.LineLayoutL_lineDrawablePassedL, R.drawable.default_r_line_view_img_passed);
+        Bitmap lineDrawablePassedBitmap = BitmapFactory.decodeResource(getResources(), lineDrawablePassedId);
+        lineDrawablePassedNinePatch = new NinePatch(lineDrawablePassedBitmap, lineDrawablePassedBitmap.getNinePatchChunk(), null);
+        int lineDrawablePassingId = a.getResourceId(
+                R.styleable.LineLayoutL_lineDrawablePassingL, R.drawable.default_r_line_view_img_passing);
+        Bitmap lineDrawablePassingBitmap = BitmapFactory.decodeResource(getResources(), lineDrawablePassingId);
+        lineDrawablePassingNinePatch = new NinePatch(lineDrawablePassingBitmap, lineDrawablePassingBitmap.getNinePatchChunk(), null);
+        rect = new Rect();
         a.recycle();
     }
 
@@ -265,19 +276,28 @@ public class LineLayoutL extends ViewGroup {
             stationPoints[i * 2 + 1] = lineCenter;
         }
         for (int i = 0; i < listData.size() - 1; i++) {
+            NinePatch lineNinePatch;
+            if (i < stopNumber) {
+                lineNinePatch = lineDrawablePassedNinePatch;
+            } else {
+                lineNinePatch = lineDrawableNoPassNinePatch;
+            }
             rect.left = (int) (linePoints[i * 4]);
             rect.top = (int) (linePoints[i * 4 + 1] - lineViewHeight / 2f);
             rect.right = (int) (linePoints[i * 4 + 2]);
             rect.bottom = (int) (linePoints[i * 4 + 3] + lineViewHeight / 2f);
-            if (lineBitmapIsNinePatch) {
-                ninePatch.draw(canvas, rect);
-            } else {
-                lineDrawable.setBounds(rect);
-                lineDrawable.draw(canvas);
-            }
+            lineNinePatch.draw(canvas, rect);
         }
 
         for (int i = 0; i < listData.size(); i++) {
+            Drawable pointDrawable;
+            if (i < stopNumber) {
+                pointDrawable = pointDrawablePassed;
+            } else if (i == stopNumber) {
+                pointDrawable = pointDrawablePassing;
+            } else {
+                pointDrawable = pointDrawableNoPass;
+            }
             if (i == 0 || i == listData.size() - 1) {
                 Drawable drawable = startDrawable;
                 if (i == listData.size() - 1) {
@@ -311,9 +331,9 @@ public class LineLayoutL extends ViewGroup {
             pointDrawable.draw(canvas);
         }
         if (enterOutDrawable != null) {
-            if (stopNumber != -1) {
-                enterOutDrawable.setBounds((int) (stationPoints[stopNumber * 2] - enterOutWidth / 2 + enterOutOffset), (int) (lineCenter - enterOutHeight / 2),
-                        (int) (stationPoints[stopNumber * 2] + enterOutWidth / 2 + enterOutOffset), (int) (lineCenter + enterOutHeight / 2));
+            if (stopNumber != -1&&stopType==1) {
+                enterOutDrawable.setBounds((int) (stationPoints[(stopNumber-1) * 2] - enterOutWidth / 2 + enterOutOffset), (int) (lineCenter - enterOutHeight / 2),
+                        (int) (stationPoints[(stopNumber-1) * 2] + enterOutWidth / 2 + enterOutOffset), (int) (lineCenter + enterOutHeight / 2));
                 enterOutDrawable.draw(canvas);
                 enterOutOffset = enterOutOffset + enterOutRate;
                 if (enterOutOffset > perWidth) {
@@ -377,7 +397,6 @@ public class LineLayoutL extends ViewGroup {
             view.setVisibility(View.INVISIBLE);
         }
         iv_next_tip.setVisibility(View.GONE);
-        tv_change_message.setTipsNameString("水水水水水水水水水水水水水水水水水水水上飞机苟富贵水水水水水水水水水水水水水水水水水水水上飞机苟富贵");
         addView(view);
     }
 
