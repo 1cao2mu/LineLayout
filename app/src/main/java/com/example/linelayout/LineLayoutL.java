@@ -304,13 +304,13 @@ public class LineLayoutL extends ViewGroup {
                     drawable = endDrawable;
                 }
                 if (startEndMod == STARTENDMOD_CENTER) {
-                    drawable.setBounds((int) (stationPoints[i * 2] - startEndHeight / 2), (int) (lineCenter - startEndHeight / 2),
-                            (int) (stationPoints[i * 2] + startEndHeight / 2), (int) (lineCenter + startEndHeight / 2));
+                    drawable.setBounds((int) (stationPoints[i * 2] - startEndWidth / 2), (int) (lineCenter - startEndHeight / 2),
+                            (int) (stationPoints[i * 2] + startEndWidth / 2), (int) (lineCenter + startEndHeight / 2));
                     drawable.draw(canvas);
                     continue;
                 } else if (startEndMod == STARTENDMOD_TOP) {
-                    drawable.setBounds((int) (stationPoints[i * 2] - startEndHeight / 2), (int) (lineCenter - lineViewHeight / 2 - startEndHeight),
-                            (int) (stationPoints[i * 2] + startEndHeight / 2), (int) (lineCenter - lineViewHeight / 2));
+                    drawable.setBounds((int) (stationPoints[i * 2] - startEndWidth / 2), (int) (lineCenter - lineViewHeight / 2 - startEndHeight),
+                            (int) (stationPoints[i * 2] + startEndWidth / 2), (int) (lineCenter - lineViewHeight / 2));
                     drawable.draw(canvas);
                 }
             }

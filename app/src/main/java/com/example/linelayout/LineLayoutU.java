@@ -29,11 +29,10 @@ import java.util.List;
  * 自定义线路组件-U型
  */
 public class LineLayoutU extends ViewGroup {
+    private static final int STARTENDMOD_LEFT = 0;
+    private static final int STARTENDMOD_CENTER = 1;
     // TODO: 2020/3/13 以后统一加注释
     //静态变量
-    private static final int REMAINMODE_TOPMAX = 0;
-    private static final int REMAINMODE_BOTTOMMAX = 1;
-    private static final int REMAINMODE_CENTERMAX = 2;
     //可设置参数
     private int lineLayoutHeight = 40;
     private int lineViewHeight = 22;
@@ -42,7 +41,6 @@ public class LineLayoutU extends ViewGroup {
     private Drawable pointDrawablePassing;
     private int pointViewHeight = 30;
     private int pointViewWidth = 30;
-    private int remainMode = REMAINMODE_CENTERMAX;
     private int tipsNameLayoutHeight = 100;
 
     private NinePatch lineDrawableNoPassNinePatch;
@@ -67,6 +65,11 @@ public class LineLayoutU extends ViewGroup {
     private AnimationDrawable pointAnim;
     private float pointAnimWidth = 30;
     private float pointAnimHeight = 30;
+    private float startEndWidth = 40;
+    private float startEndHeight = 40;
+    private int startEndMod = STARTENDMOD_LEFT;
+    private Drawable startDrawable;
+    private Drawable endDrawable;
 
     //需要使用的局部变量
     private Context context;
@@ -81,7 +84,6 @@ public class LineLayoutU extends ViewGroup {
     private float[] bottomPointPoints;
     private int topPointNum = 0;
     private int bottomPointNum = 0;
-
     private Rect rect;
     private int offsetLeft = 0;
     private int offsetRight = 0;
@@ -219,9 +221,30 @@ public class LineLayoutU extends ViewGroup {
         pointAnimWidth = a.getDimension(R.styleable.LineLayoutR_pointAnimWidthR, pointAnimWidth);
         pointAnimHeight = a.getDimension(R.styleable.LineLayoutR_pointAnimHeightR, pointAnimHeight);
 
+        if (a.hasValue(R.styleable.LineLayoutU_startDrawableU)) {
+            startDrawable = a.getDrawable(
+                    R.styleable.LineLayoutU_startDrawableU);
+        } else {
+            if (startEndMod == STARTENDMOD_LEFT) {
+                startDrawable = getResources().getDrawable(R.mipmap.start_left);
+            } else {
+                startDrawable = getResources().getDrawable(R.mipmap.start_center);
+            }
+        }
+
+        if (a.hasValue(R.styleable.LineLayoutU_endDrawableU)) {
+            endDrawable = a.getDrawable(
+                    R.styleable.LineLayoutU_endDrawableU);
+        } else {
+            if (startEndMod == STARTENDMOD_LEFT) {
+                endDrawable = getResources().getDrawable(R.mipmap.end_left);
+            } else {
+                endDrawable = getResources().getDrawable(R.mipmap.end_center);
+            }
+        }
+
         rect = new Rect();
 
-        remainMode = a.getInt(R.styleable.LineLayoutU_remainMode, remainMode);
         a.recycle();
     }
 
@@ -236,8 +259,6 @@ public class LineLayoutU extends ViewGroup {
         int contentWidth = totalWidth - paddingLeft - paddingRight;
         int contentHeight = totalHeight - paddingTop - paddingBottom;
         int count = getChildCount();
-        topPerWidth = (contentWidth - offsetLeft-offsetRight) / (topPointNum-1);
-        bottomPerWidth = (contentWidth - offsetLeft-offsetRight) / (bottomPointNum-1);
         int left, top, right, bottom;
         int tipsNameTop = (int) (paddingTop + contentHeight / 2f - tipsNameLayoutHeight / 2f - lineLayoutHeight);
         int tipsNameBottom = (int) (paddingTop + contentHeight / 2f + tipsNameLayoutHeight / 2f + lineLayoutHeight);
@@ -249,7 +270,11 @@ public class LineLayoutU extends ViewGroup {
                 int childMeasureWidth = child.getMeasuredWidth();
                 int childMeasureHeight = child.getMeasuredHeight();
                 offsetLeft = (childMeasureWidth > pointViewWidth ? childMeasureWidth : pointViewWidth) / 2;
-
+                if (startEndMod == STARTENDMOD_LEFT) {
+                    offsetLeft += startEndWidth;
+                }
+                topPerWidth = (contentWidth - offsetLeft - offsetRight) / (topPointNum - 1);
+                bottomPerWidth = (contentWidth - offsetLeft - offsetRight) / (bottomPointNum - 1);
                 j++;
                 if (j < topPointNum) {
                     //如果一行没有排满，继续往右排列
@@ -403,9 +428,36 @@ public class LineLayoutU extends ViewGroup {
             } else {
                 pointDrawable = pointDrawableNoPass;
             }
-            if (stopNumber == listData.size()&&i==0){
-                continue;
+            if (i == 0 || i == listData.size() - 1) {
+                Drawable drawable = startDrawable;
+                if (startEndMod == STARTENDMOD_CENTER) {
+                    if (i == 0) {
+                        drawable = startDrawable;
+                        drawable.setBounds((int) (topPointPoints[i * 2] - startEndWidth / 2), (int) (lineTop - startEndHeight / 2),
+                                (int) (topPointPoints[i * 2] + startEndWidth / 2), (int) (lineTop + startEndHeight / 2));
+                    } else if (i == listData.size() - 1) {
+                        drawable = endDrawable;
+                        int j = bottomPointNum - (i - topPointNum) - 1;
+                        drawable.setBounds((int) (bottomPointPoints[j * 2] - startEndWidth / 2), (int) (lineBottom - startEndHeight / 2),
+                                (int) (bottomPointPoints[j * 2] + startEndWidth / 2), (int) (lineBottom + startEndHeight / 2));
+                    }
+                    drawable.draw(canvas);
+                    continue;
+                } else if (startEndMod == STARTENDMOD_LEFT) {
+                    if (i == 0) {
+                        drawable = startDrawable;
+                        drawable.setBounds((int) (topPointPoints[i * 2] - pointViewWidth / 2f - startEndWidth), (int) (lineTop - startEndHeight / 2),
+                                (int) (topPointPoints[i * 2] - pointViewWidth / 2f), (int) (lineTop + startEndHeight / 2));
+                    } else if (i == listData.size() - 1) {
+                        int j = bottomPointNum - (i - topPointNum) - 1;
+                        drawable = endDrawable;
+                        drawable.setBounds((int) (bottomPointPoints[j * 2] - pointViewWidth / 2f - startEndWidth), (int) (lineBottom - startEndHeight / 2),
+                                (int) (bottomPointPoints[j * 2] - pointViewWidth / 2f), (int) (lineBottom + startEndHeight / 2));
+                    }
+                    drawable.draw(canvas);
+                }
             }
+
             if (stopNumber == i) {
                 if (pointAnim != null && pointAnimCurrentInt != -1) {
                     Drawable drawable = pointAnim.getFrame(pointAnimCurrentInt);

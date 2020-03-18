@@ -39,13 +39,17 @@
         <attr name="bottomDrawablePassedU" format="color|reference" />
         <attr name="bottomDrawablePassingU" format="color|reference" />
 
-        <attr name="remainMode" format="enum">
-            <enum name="topMax" value="0" />
-            <enum name="bottomMax" value="1" />
-            <enum name="centerMax" value="2" />
-        </attr>
         <attr name="lineViewHeight" format="dimension" />
         <attr name="tipsNameLayoutHeight" format="dimension" />
+
+        <attr name="startDrawableU" format="reference" />
+        <attr name="endDrawableU" format="reference" />
+        <attr name="startEndModU" format="enum">
+            <enum name="left" value="0" />
+            <enum name="center" value="1" />
+        </attr>
+        <attr name="startEndWidthU" format="dimension" />
+        <attr name="startEndHeightU" format="dimension" />
     </declare-styleable>
 
     <declare-styleable name="LineLayoutR">
