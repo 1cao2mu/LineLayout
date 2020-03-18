@@ -25,15 +25,19 @@
     </declare-styleable>
 
     <declare-styleable name="LineLayoutU">
-        <attr name="pointDrawableNoPass" format="color|reference" />
-        <attr name="pointDrawablePassed" format="color|reference" />
-        <attr name="pointDrawablePassing" format="color|reference" />
-        <attr name="lineDrawableNoPass" format="color|reference" />
-        <attr name="lineDrawablePassed" format="color|reference" />
-        <attr name="lineDrawablePassing" format="color|reference" />
+        <attr name="pointDrawableNoPassU" format="color|reference" />
+        <attr name="pointDrawablePassedU" format="color|reference" />
+        <attr name="pointDrawablePassingU" format="color|reference" />
+        <attr name="lineDrawableNoPassU" format="color|reference" />
+        <attr name="lineDrawablePassedU" format="color|reference" />
+        <attr name="lineDrawablePassingU" format="color|reference" />
 
-        <attr name="uTopDrawableNoPass" format="color|reference" />
-        <attr name="uBottomDrawableNoPass" format="color|reference" />
+        <attr name="topDrawableNoPassU" format="color|reference" />
+        <attr name="topDrawablePassedU" format="color|reference" />
+        <attr name="topDrawablePassingU" format="color|reference" />
+        <attr name="bottomDrawableNoPassU" format="color|reference" />
+        <attr name="bottomDrawablePassedU" format="color|reference" />
+        <attr name="bottomDrawablePassingU" format="color|reference" />
 
         <attr name="remainMode" format="enum">
             <enum name="topMax" value="0" />

@@ -468,6 +468,8 @@ public class LineLayoutR extends ViewGroup {
                 }
             }
         }
+
+
         for (int i = 0; i < listData.size(); i++) {
             Drawable pointDrawable;
             if (i < stopNumber) {
