@@ -26,21 +26,21 @@ public class MainActivity extends AppCompatActivity {
                 listData.add("第" + i + "站");
             }
             line.setListData(listData);
-            line.setStopNumber(5,0);
+            line.setStopNumber(3,1);
         }
         if (line_u!=null){
             for (int i = 0; i < 11; i++) {
                 listData.add("第" + i + "站");
             }
             line_u.setListData(listData);
-            line_u.setStopNumber(5,0);
+            line_u.setStopNumber(4,1);
         }
         if (line_r!=null){
             for (int i = 0; i < 11; i++) {
                 listData.add("第" + i + "站");
             }
             line_r.setListData(listData);
-            line_r.setStopNumber(9,1);
+            line_r.setStopNumber(10,1);
         }
     }
 }

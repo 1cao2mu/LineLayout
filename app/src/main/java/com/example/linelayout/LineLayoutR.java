@@ -1,5 +1,9 @@
 package com.example.linelayout;
 
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
+import android.animation.TypeEvaluator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
@@ -7,6 +11,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.NinePatch;
+import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.Drawable;
@@ -16,6 +21,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -71,6 +77,10 @@ public class LineLayoutR extends ViewGroup {
     private float pointAnimWidth = 30;
     private float pointAnimHeight = 30;
 
+    private Drawable enterOutDrawable;
+    private float enterOutWidth = 40;
+    private float enterOutHeight = 40;
+
     //需要使用的局部变量
     private Context context;
     private int topPerWidth = 0;
@@ -89,9 +99,11 @@ public class LineLayoutR extends ViewGroup {
     private int pointAnimCurrentInt = -1;
     //子组件和相关
     private List<StationNameView> nameViewList = new ArrayList<>();
+    private ImageView iv_enter_out;
     private ImageView iv_next_tip;
     private TextView tv_next_tip;
     private TipsNameView tv_change_message;
+    private int enterOutIsCurrentStop = -1;
 
     private Handler handler = new Handler(new Handler.Callback() {
         @Override
@@ -258,6 +270,12 @@ public class LineLayoutR extends ViewGroup {
         pointAnimWidth = a.getDimension(R.styleable.LineLayoutR_pointAnimWidthR, pointAnimWidth);
         pointAnimHeight = a.getDimension(R.styleable.LineLayoutR_pointAnimHeightR, pointAnimHeight);
         rect = new Rect();
+        if (a.hasValue(R.styleable.LineLayoutU_enterOutDrawableU)) {
+            enterOutDrawable = a.getDrawable(
+                    R.styleable.LineLayoutU_enterOutDrawableU);
+        } else {
+            enterOutDrawable = getResources().getDrawable(R.drawable.go);
+        }
         a.recycle();
     }
 
@@ -283,7 +301,7 @@ public class LineLayoutR extends ViewGroup {
             if (child instanceof StationNameView) {
                 int childMeasureWidth = child.getMeasuredWidth();
                 int childMeasureHeight = child.getMeasuredHeight();
-                offsetLeft = tipsNameLayoutHeight / 2 + lineLayoutHeight / 2 + lineViewHeight / 2;
+                offsetLeft = tipsNameLayoutHeight / 2 + lineLayoutHeight;
                 topPerWidth = (contentWidth - offsetLeft - offsetRight) / (topPointNum - 1);
                 bottomPerWidth = (contentWidth - offsetLeft - offsetRight) / (bottomPointNum - 1);
                 j++;
@@ -304,6 +322,10 @@ public class LineLayoutR extends ViewGroup {
                     //确定子控件的位置，四个参数分别代表（左上右下）点的坐标值
                 }
                 child.layout(left, top, right, bottom);
+            } else if (child instanceof ImageView) {
+                int childMeasureWidth = child.getMeasuredWidth();
+                int childMeasureHeight = child.getMeasuredHeight();
+                child.layout((int) (-enterOutWidth / 2), (int) (-enterOutHeight / 2), (int) (childMeasureWidth - enterOutWidth / 2), (int) (childMeasureHeight - enterOutHeight / 2));
             } else {
                 child.layout(paddingLeft + offsetLeft, tipsNameTop, contentWidth + paddingLeft - offsetRight, tipsNameBottom);
             }
@@ -314,12 +336,12 @@ public class LineLayoutR extends ViewGroup {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         // 计算出所有的childView的宽和高
         final int size = getChildCount();
-        offsetRight = tipsNameLayoutHeight / 2 + lineLayoutHeight / 2 + lineViewHeight / 2;
-        offsetLeft = tipsNameLayoutHeight / 2 + lineLayoutHeight / 2 + lineViewHeight / 2;
+        offsetRight = tipsNameLayoutHeight / 2 + lineLayoutHeight;
+        offsetLeft = tipsNameLayoutHeight / 2 + lineLayoutHeight;
         for (int i = 0; i < size; ++i) {
             final View child = getChildAt(i);
             if (child.getVisibility() != GONE) {
-                if (child instanceof StationNameView) {
+                if (child instanceof StationNameView || child instanceof ImageView) {
                     measureChild(child, widthMeasureSpec, heightMeasureSpec);
                 } else {
                     int widthSize = MeasureSpec.getSize(widthMeasureSpec);
@@ -359,20 +381,20 @@ public class LineLayoutR extends ViewGroup {
             topPointPoints[i * 2 + 1] = lineTop;
         }
 
-        centerPointPoints[0] = getPaddingLeft();
+        centerPointPoints[0] = getPaddingLeft() + (lineLayoutHeight-lineViewHeight) / 2f;
         centerPointPoints[1] = paddingTop + contentHeight / 2;
-        centerPointPoints[2] = getWidth() - paddingRight;
+        centerPointPoints[2] = getWidth() - paddingRight - (lineLayoutHeight-lineViewHeight) / 2f;
         centerPointPoints[3] = paddingTop + contentHeight / 2;
 
         for (int i = 0; i < bottomPointNum; i++) {
             if (i != bottomPointNum - 1) {
                 bottomLinePoints[i * 4] = paddingLeft + ((i) * bottomPerWidth);
-                bottomLinePoints[i * 4 + 1] = lineTop;
+                bottomLinePoints[i * 4 + 1] = lineBottom;
                 bottomLinePoints[i * 4 + 2] = paddingLeft + ((i + 1.0f) * bottomPerWidth);
-                bottomLinePoints[i * 4 + 3] = lineTop;
+                bottomLinePoints[i * 4 + 3] = lineBottom;
             }
             bottomPointPoints[i * 2] = paddingLeft + (i) * bottomPerWidth;
-            bottomPointPoints[i * 2 + 1] = lineTop;
+            bottomPointPoints[i * 2 + 1] = lineBottom;
         }
 
         Drawable rightTopDrawable, rightBottomDrawable;
@@ -479,7 +501,7 @@ public class LineLayoutR extends ViewGroup {
             } else {
                 pointDrawable = pointDrawableNoPass;
             }
-            if (stopNumber == listData.size()&&i==0){
+            if (stopNumber == listData.size() && i == 0) {
                 continue;
             }
             if (stopNumber == i) {
@@ -515,6 +537,102 @@ public class LineLayoutR extends ViewGroup {
                         (int) (bottomPointPoints[j * 2] + pointViewWidth / 2f), (int) (lineBottom + pointViewHeight / 2f));
                 pointDrawable.draw(canvas);
             }
+        }
+
+        if (stopNumber != -1 && stopType == 1) {
+            startEndOutAnim();
+        } else {
+            stopEndOutAnim();
+        }
+    }
+
+    private void startEndOutAnim() {
+        if (iv_enter_out != null) {
+            iv_enter_out.setVisibility(VISIBLE);
+        } else {
+            return;
+        }
+        if (enterOutIsCurrentStop != stopNumber) {
+            AnimatorSet animatorSet = new AnimatorSet();
+            ValueAnimator valueAnimatorP = new ValueAnimator();
+            if (stopNumber == topPointNum) {
+                valueAnimatorP.setObjectValues(new PointF(0, 0));
+                valueAnimatorP.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animation) {
+                        PointF point = (PointF) animation.getAnimatedValue();
+                        iv_enter_out.setTranslationX(point.x);
+                        iv_enter_out.setTranslationY(point.y);
+                    }
+                });
+                final float d = tipsNameLayoutHeight + lineLayoutHeight;
+                valueAnimatorP.setEvaluator(new TypeEvaluator() {
+                    @Override
+                    public Object evaluate(float fraction, Object startValue, Object endValue) {
+                        return BezierUtil.calculateBezierPointForCubic(fraction,
+                                new PointF(topPointPoints[(topPointNum - 1) * 2], topPointPoints[(topPointNum - 1) * 2 + 1]),
+                                new PointF(topPointPoints[(topPointNum - 1) * 2] + d / 3 * 2, topPointPoints[(topPointNum - 1) * 2 + 1]),
+                                new PointF(bottomPointPoints[(bottomPointNum - 1) * 2] + d / 3 * 2, bottomPointPoints[(bottomPointNum - 1) * 2 + 1]),
+                                new PointF(bottomPointPoints[(bottomPointNum - 1) * 2], bottomPointPoints[(bottomPointNum - 1) * 2 + 1]));
+                    }
+                });
+                ObjectAnimator mAnimatorR = ObjectAnimator.ofFloat(iv_enter_out, View.ROTATION, 0, 90, 180);
+                valueAnimatorP.setRepeatCount(Animation.INFINITE);
+                mAnimatorR.setRepeatCount(Animation.INFINITE);
+                animatorSet.playTogether(mAnimatorR, valueAnimatorP);
+            } else if (stopNumber == listData.size()) {
+                valueAnimatorP.setObjectValues(new PointF(0, 0));
+                valueAnimatorP.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animation) {
+                        PointF point = (PointF) animation.getAnimatedValue();
+                        iv_enter_out.setTranslationX(point.x);
+                        iv_enter_out.setTranslationY(point.y);
+                    }
+                });
+                final float d = tipsNameLayoutHeight + lineLayoutHeight;
+                valueAnimatorP.setEvaluator(new TypeEvaluator() {
+                    @Override
+                    public Object evaluate(float fraction, Object startValue, Object endValue) {
+                        return BezierUtil.calculateBezierPointForCubic(fraction,
+                                new PointF(bottomPointPoints[0], bottomPointPoints[1]),
+                                new PointF(bottomPointPoints[0] - d / 3 * 2, bottomPointPoints[1]),
+                                new PointF(topPointPoints[0] - d / 3 * 2, topPointPoints[1]),
+                                new PointF(topPointPoints[0], topPointPoints[1])
+                        );
+                    }
+                });
+                ObjectAnimator mAnimatorR = ObjectAnimator.ofFloat(iv_enter_out, View.ROTATION, 180, 270, 360);
+                valueAnimatorP.setRepeatCount(Animation.INFINITE);
+                mAnimatorR.setRepeatCount(Animation.INFINITE);
+                animatorSet.playTogether(mAnimatorR, valueAnimatorP);
+
+            } else if (stopNumber < topPointNum) {
+                ObjectAnimator mAnimatorX = ObjectAnimator.ofFloat(iv_enter_out, View.TRANSLATION_X, topPointPoints[(stopNumber - 1) * 2], topPointPoints[(stopNumber) * 2]);
+                ObjectAnimator mAnimatorY = ObjectAnimator.ofFloat(iv_enter_out, View.TRANSLATION_Y, topPointPoints[1], topPointPoints[1]);
+                mAnimatorX.setRepeatCount(Animation.INFINITE);
+                mAnimatorY.setRepeatCount(Animation.INFINITE);
+                animatorSet.playTogether(mAnimatorX, mAnimatorY);
+            } else {//stopNumber>topPointNum
+                int j = bottomPointNum - (stopNumber - topPointNum);
+                ObjectAnimator mAnimatorX = ObjectAnimator.ofFloat(iv_enter_out, View.TRANSLATION_X, bottomPointPoints[(j) * 2], bottomPointPoints[(j - 1) * 2]);
+                ObjectAnimator mAnimatorY = ObjectAnimator.ofFloat(iv_enter_out, View.TRANSLATION_Y, bottomPointPoints[1], bottomPointPoints[1]);
+                ObjectAnimator mAnimatorR = ObjectAnimator.ofFloat(iv_enter_out, View.ROTATION, 180, 180);
+                mAnimatorX.setRepeatCount(Animation.INFINITE);
+                mAnimatorY.setRepeatCount(Animation.INFINITE);
+                mAnimatorR.setRepeatCount(Animation.INFINITE);
+                animatorSet.playTogether(mAnimatorX, mAnimatorY, mAnimatorR);
+            }
+            animatorSet.setDuration(2000);
+            animatorSet.start();
+
+            enterOutIsCurrentStop = stopNumber;
+        }
+    }
+
+    private void stopEndOutAnim() {
+        if (iv_enter_out != null) {
+            iv_enter_out.setVisibility(INVISIBLE);
         }
     }
 
@@ -581,6 +699,18 @@ public class LineLayoutR extends ViewGroup {
             view.setVisibility(View.INVISIBLE);
         }
         addView(view);
+        iv_enter_out = new ImageView(context);
+        iv_enter_out.setScaleType(ImageView.ScaleType.FIT_XY);
+        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams((int) enterOutWidth, (int) enterOutHeight);
+        iv_enter_out.setLayoutParams(layoutParams);
+        if (stopType == 1 && stopNumber != -1) {
+            iv_enter_out.setImageDrawable(enterOutDrawable);
+            iv_enter_out.setVisibility(View.VISIBLE);
+        } else {
+            iv_enter_out.setImageDrawable(null);
+            iv_enter_out.setVisibility(View.INVISIBLE);
+        }
+        addView(iv_enter_out);
     }
 
 
@@ -597,6 +727,7 @@ public class LineLayoutR extends ViewGroup {
     }
 
     public void setStopNumber(int stopNumber, int stopType) {
+        this.enterOutIsCurrentStop = -1;
         this.stopType = stopType;
         if (stopType == 1) {
             this.stopNumber = stopNumber + 1;

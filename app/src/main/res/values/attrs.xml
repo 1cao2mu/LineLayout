@@ -50,6 +50,11 @@
         </attr>
         <attr name="startEndWidthU" format="dimension" />
         <attr name="startEndHeightU" format="dimension" />
+
+        <attr name="enterOutDrawableU" format="reference" />
+        <attr name="enterOutWidthU" format="dimension" />
+        <attr name="enterOutHeightU" format="dimension" />
+        <attr name="enterOutRateU" format="integer" />
     </declare-styleable>
 
     <declare-styleable name="LineLayoutR">
